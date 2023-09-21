@@ -1,0 +1,7 @@
+{
+  "DB": {
+    "Driver": "mysql",
+    "DSN": "root:my123456@tcp(127.0.0.1:3306)/mycube2?charset=utf8&parseTime=True&loc=Local"
+  },
+  "Port": 20001
+}
