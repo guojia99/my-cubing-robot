@@ -1,6 +1,6 @@
 module github.com/guojia99/my_cubing_robot
 
-go 1.21.0
+go 1.21
 
 require (
 	github.com/gin-gonic/gin v1.9.1
