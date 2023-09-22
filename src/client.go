@@ -72,7 +72,7 @@ func (c *Client) Listen() {
 			if err := c.messageProcess(data); err != nil {
 				continue
 			}
-			if time.Now().Sub(ts) < time.Second*5 {
+			if time.Now().Sub(ts) < time.Second*2 {
 				time.Sleep(time.Now().Sub(ts))
 			}
 		}
