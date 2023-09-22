@@ -40,8 +40,8 @@ func (c *Client) processSor(msg Message) error {
 	b := allBest[key]
 	a := allAvg[key]
 
-	out := fmt.Sprintf("--------------- %s ---------------\n", key)
-	out += fmt.Sprintf("详情请查看 :http://mycube.club/statistics/sor?sor_tabs=%s", key)
+	out := fmt.Sprintf("--------- %s ----------\n", key)
+	out += fmt.Sprintf("详情请查看 :http://mycube.club/statistics/sor?sor_tabs=%s\n", key)
 	for idx, best := range b {
 		if idx >= 10 {
 			break
