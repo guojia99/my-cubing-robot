@@ -2,71 +2,51 @@ package src
 
 import (
 	"fmt"
-	"strconv"
+	"log"
 	"strings"
-
-	"github.com/guojia99/my-cubing/src/core/model"
 )
 
-const processContestListKey = "*比赛列表"
+// https://github.com/fuqiuluo/unidbg-fetch-qsign 签名服务器
 
-func (c *Client) processContestList(msg Message) error {
-	in := strings.ReplaceAll(msg.Message, processContestListKey, "")
-	in = strings.ReplaceAll(in, " ", "")
-
-	var contests []model.Contest
-	if err := c.db.Limit(10).Order("created_at DESC").Find(&contests).Error; err != nil {
-		return err
+func (c *Client) setMessage(msg Message) {
+	if len(msg.Message) < 1 {
+		return
 	}
-	out := "比赛列表[序号|名称]\n"
-	for _, val := range contests {
-		out += fmt.Sprintf("%d.%s\n", val.ID, val.Name)
+	if msg.Message[0] == '*' {
+		c.ch <- msg
 	}
-	out += "----------------- \n"
-	out += "回复 `*比赛 +{编号}` 即可获取比赛详情"
-
-	return SendMessage(SendMessageModel{GroupId: msg.GroupId, Message: out})
 }
 
-const processContestKey = "*比赛"
+var processFnsKey = []string{
+	processProjectKey,
+	processPlayerKey,
+	processContestListKey,
+	processContestKey,
+	processSorKey,
+	processHelpKey,
+}
 
-func (c *Client) processContest(msg Message) error {
-	in := strings.ReplaceAll(msg.Message, processContestKey, "")
-	in = strings.ReplaceAll(in, " ", "")
+func (c *Client) initProcess() {
+	c.processFns = map[string]func(msg Message) error{
+		processProjectKey:     c.processProject,
+		processPlayerKey:      c.processPlayer,
+		processContestListKey: c.processContestList,
+		processContestKey:     c.processContest,
+		processSorKey:         c.processSor,
+		processHelpKey:        c.processHelp,
+	}
+}
 
-	fmt.Println(in)
-	var contest model.Contest
-	if len(in) == 0 {
-		c.db.Order("created_at DESC").First(&contest)
-	} else {
-		id, err := strconv.Atoi(in)
-		if err != nil {
-			return err
+func (c *Client) messageProcess(msg Message) error {
+	defer func() {
+		if result := recover(); result != nil {
+			log.Println(result)
 		}
-		c.db.Where("id = ?", id).First(&contest)
+	}()
+	for _, key := range processFnsKey {
+		if strings.HasPrefix(msg.Message, key) {
+			return c.processFns[key](msg)
+		}
 	}
-
-	if contest.ID == 0 {
-		return SendMessage(SendMessageModel{GroupId: msg.GroupId, Message: "未查询到数据"})
-	}
-
-	return SendMessage(
-		SendMessageModel{
-			GroupId: msg.GroupId,
-			Message: fmt.Sprintf(
-				`比赛详情
----------------------
-比赛: %s
-简介: %s
-时间: (%s - %s)
-状态: %v
-网址: http://mycube.club/contest?id=%d`,
-				contest.Name,
-				contest.Description,
-				contest.StartTime.Format("20060102"), contest.EndTime.Format("20060102"),
-				contest.IsEnd,
-				contest.ID,
-			),
-		},
-	)
+	return fmt.Errorf("not suppr")
 }

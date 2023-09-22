@@ -14,17 +14,20 @@ import (
 )
 
 type Client struct {
-	cfg *Config
-	e   *gin.Engine
-	ch  chan Message
-	db  *gorm.DB
-	cli core.Core
+	cfg  *Config
+	e    *gin.Engine
+	ch   chan Message
+	db   *gorm.DB
+	core core.Core
+
+	processFns map[string]func(msg Message) error
 }
 
 func NewClient(config string) (*Client, error) {
 	c := &Client{
-		e:  gin.Default(),
-		ch: make(chan Message, 2048),
+		e:          gin.Default(),
+		ch:         make(chan Message, 2048),
+		processFns: make(map[string]func(msg Message) error),
 	}
 	if err := c.Load(config); err != nil {
 		return nil, err
@@ -38,12 +41,13 @@ func NewClient(config string) (*Client, error) {
 			Logger: logger.Discard,
 		})
 	}
+	c.initProcess()
 
 	if err != nil {
 		return nil, err
 	}
 
-	c.cli = core.NewScoreCore(c.db, false)
+	c.core = core.NewScoreCore(c.db, false)
 	return c, nil
 }
 
