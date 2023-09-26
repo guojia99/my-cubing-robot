@@ -101,15 +101,15 @@ func (c *Client) listenOutPutMessage() {
 	for {
 		select {
 		case data := <-c.outCh:
-			for i := 0; i < 3; i++ {
-				err := c.sendMessage(data.GroupId, data.Message)
-				if err == nil {
-					time.Sleep(time.Second * 2)
-					break
-				}
-				log.Println("重发", err)
+			//for i := 0; i < 3; i++ {
+			err := c.sendMessage(data.GroupId, data.Message)
+			if err == nil {
 				time.Sleep(time.Second * 2)
+				break
 			}
+			//log.Println("重发", err)
+			//time.Sleep(time.Second * 2)
+			//}
 		}
 	}
 }

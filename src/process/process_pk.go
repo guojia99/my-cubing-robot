@@ -37,7 +37,7 @@ func PK(db *gorm.DB, core core.Core, inMessage string) (outMessage string) {
 		return fmt.Sprintf("找不到选手`%s`", name2)
 	}
 
-	outMessage = fmt.Sprintf("%s VS %s", player1.Name, player2.Name)
+	outMessage = fmt.Sprintf("%s VS %s\n", player1.Name, player2.Name)
 
 	p1Best, p1Avg := core.GetPlayerBestScore(player1.ID)
 	p2Best, p2Avg := core.GetPlayerBestScore(player2.ID)
@@ -76,7 +76,7 @@ func PK(db *gorm.DB, core core.Core, inMessage string) (outMessage string) {
 			continue
 		}
 
-		outMessage += "\t  "
+		outMessage += "\t\t  "
 		if p1Aok2 && !p2Aok2 {
 			outMessage += fmt.Sprintf("%s || %s", star+utils.TB(utils.TimeParser(p1A.Score, true), 5), utils.TB("-", 5))
 			p1Count += 1
