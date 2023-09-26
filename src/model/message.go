@@ -1,8 +1,4 @@
-package src
-
-import (
-	"github.com/guojia99/my_cubing_robot/src/utils"
-)
+package model
 
 type Message struct {
 	Anonymous   interface{} `json:"anonymous"`
@@ -59,18 +55,7 @@ type MessageST struct {
 	} `json:"stat"`
 }
 
-type SendMessageModel struct {
+type SendMessage struct {
 	GroupId int    `json:"group_id"`
 	Message string `json:"message"`
-}
-
-func SendMessage(groupId int, message string) error {
-	if message[len(message)-1] == '\n' {
-		message = message[:len(message)-1]
-	}
-	_, err := utils.HTTPRequest("POST", "http://127.0.0.1:5700/send_group_msg", nil, nil, SendMessageModel{
-		GroupId: groupId,
-		Message: message,
-	})
-	return err
 }

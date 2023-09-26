@@ -4,9 +4,11 @@ go 1.21
 
 require (
 	github.com/gin-gonic/gin v1.9.1
-	github.com/guojia99/my-cubing v0.2.2
+	github.com/guojia99/my-cubing v0.2.3
 	github.com/json-iterator/go v1.1.12
+	github.com/m4rw3r/uuid v1.0.1
 	github.com/spf13/cobra v1.7.0
+	github.com/wangjia184/sortedset v0.0.0-20220209072355-af6d6d227aa7
 	gorm.io/driver/mysql v1.5.1
 	gorm.io/driver/sqlite v1.5.2
 	gorm.io/gorm v1.25.2-0.20230530020048-26663ab9bf55

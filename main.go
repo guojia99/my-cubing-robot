@@ -17,8 +17,8 @@ func NewAPIServerCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			go c.Listen()
-			return c.Run()
+			c.Run()
+			return nil
 		},
 	}
 	cmd.Flags().StringVarP(&config, "config", "c", "./etc/configs.json", "配置")

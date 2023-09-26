@@ -7,8 +7,9 @@ import (
 )
 
 type Config struct {
-	DB   DBConfig `json:"DB"`
-	Port int      `json:"Port"`
+	DB         DBConfig `json:"DB"`
+	Port       int      `json:"Port"`
+	NotMessage bool     `json:"NotMessage"`
 }
 
 type DBConfig struct {
