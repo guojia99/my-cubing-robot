@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/guojia99/my-cubing/src/core"
-	"github.com/guojia99/my-cubing/src/core/model"
+	core "github.com/guojia99/my-cubing-core"
+	"github.com/guojia99/my-cubing-core/model"
 	"gorm.io/gorm"
 
 	"github.com/guojia99/my_cubing_robot/src/utils"
@@ -44,7 +44,7 @@ func Rank(db *gorm.DB, core core.Core, inMessage string) (outMessage string) {
 		return ""
 	}
 
-	allBest, allAvg := core.GetAllPlayerBestScore()
+	allBest, allAvg := core.GetBestScore()
 	bests, ok := allBest[pj]
 	if !ok || len(bests) == 0 {
 		return "该项目无人参加, 欢迎积极参赛"
@@ -61,7 +61,7 @@ func Rank(db *gorm.DB, core core.Core, inMessage string) (outMessage string) {
 		if ok && idx < len(avgs) {
 			outMessage += fmt.Sprintf(" || %s %s", utils.TimeParser(avgs[idx], true), avgs[idx].PlayerName)
 		}
-		
+
 		outMessage += "\n"
 	}
 

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/guojia99/my-cubing/src/core"
-	"github.com/guojia99/my-cubing/src/core/model"
+	core "github.com/guojia99/my-cubing-core"
+	"github.com/guojia99/my-cubing-core/model"
 	"gorm.io/gorm"
 
 	"github.com/guojia99/my_cubing_robot/src/utils"
@@ -76,7 +76,7 @@ func PK(db *gorm.DB, core core.Core, inMessage string) (outMessage string) {
 			continue
 		}
 
-		outMessage += "\t\t  "
+		outMessage += utils.TB("", 5)
 		if p1Aok2 && !p2Aok2 {
 			outMessage += fmt.Sprintf("%s || %s", star+utils.TB(utils.TimeParser(p1A.Score, true), 5), utils.TB("-", 5))
 			p1Count += 1

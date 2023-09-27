@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/guojia99/my-cubing/src/core/model"
+	"github.com/guojia99/my-cubing-core/model"
 )
 
 func TimeParser(score model.Score, isAvg bool) string {

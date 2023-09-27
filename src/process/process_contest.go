@@ -3,7 +3,7 @@ package process
 import (
 	"strings"
 
-	"github.com/guojia99/my-cubing/src/core"
+	core "github.com/guojia99/my-cubing-core"
 	"gorm.io/gorm"
 )
 

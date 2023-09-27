@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/guojia99/my-cubing/src/core"
-	"github.com/guojia99/my-cubing/src/core/model"
+	core "github.com/guojia99/my-cubing-core"
+	"github.com/guojia99/my-cubing-core/model"
 	"gorm.io/gorm"
 
 	"github.com/guojia99/my_cubing_robot/src/utils"

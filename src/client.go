@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/guojia99/my-cubing/src/core"
+	core "github.com/guojia99/my-cubing-core"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -44,7 +44,7 @@ func NewClient(config string) (*Client, error) {
 	if err := c.initDB(); err != nil {
 		return nil, err
 	}
-	c.core = core.NewScoreCore(c.db, false)
+	c.core = core.NewCore(c.db, false, time.Second*30)
 	return c, nil
 }
 
@@ -101,15 +101,11 @@ func (c *Client) listenOutPutMessage() {
 	for {
 		select {
 		case data := <-c.outCh:
-			//for i := 0; i < 3; i++ {
 			err := c.sendMessage(data.GroupId, data.Message)
 			if err == nil {
 				time.Sleep(time.Second * 2)
 				break
 			}
-			//log.Println("重发", err)
-			//time.Sleep(time.Second * 2)
-			//}
 		}
 	}
 }

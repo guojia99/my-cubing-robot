@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/guojia99/my-cubing/src/core"
-	"github.com/guojia99/my-cubing/src/core/model"
+	core "github.com/guojia99/my-cubing-core"
+	"github.com/guojia99/my-cubing-core/model"
 	"gorm.io/gorm"
 )
 
@@ -63,7 +63,7 @@ func Sor(db *gorm.DB, core core.Core, inMessage string) (outMessage string) {
 		key = val
 	}
 
-	allBest, allAvg := core.GetSorScore()
+	allBest, allAvg := core.GetSor()
 
 	b := allBest[key]
 	a := allAvg[key]
