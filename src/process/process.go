@@ -15,6 +15,7 @@ var ProcessDict = []ProcessFn{
 	Contest,
 	PK,
 	Help,
+	NvHaoHao,
 
 	// player查询永久垫底
 	Player,
