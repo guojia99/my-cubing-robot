@@ -44,7 +44,7 @@ func NewClient(config string) (*Client, error) {
 	if err := c.initDB(); err != nil {
 		return nil, err
 	}
-	c.core = core.NewCore(c.db, false, time.Second*30)
+	c.core = core.NewCore(c.db, false, time.Minute*5)
 	return c, nil
 }
 
