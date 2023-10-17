@@ -14,7 +14,7 @@ import (
 const star = "★ "
 const PkKey = "PK"
 
-func PK(db *gorm.DB, core core.Core, inMessage string) (outMessage string) {
+func PK(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessage string) {
 	if !strings.HasPrefix(strings.ToUpper(inMessage), PkKey) {
 		return ""
 	}

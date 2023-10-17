@@ -85,7 +85,7 @@ func (c *Client) listenInputMessage() {
 			}
 			msg := data.Message[1:]
 			for _, fn := range c.processFns {
-				if out := fn(c.db, c.core, msg); len(out) > 0 {
+				if out := fn(c.db, c.core, msg, fmt.Sprintf("%d", data.UserId)); len(out) > 0 {
 					c.outCh <- model.SendMessage{
 						GroupId: data.GroupId,
 						Message: out,

@@ -49,7 +49,7 @@ var sorKeyMap = map[string]model.SorStatisticsKey{
 const SorKey = "sor-"
 const SorKey2 = "sor"
 
-func Sor(db *gorm.DB, core core.Core, inMessage string) (outMessage string) {
+func Sor(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessage string) {
 	if !strings.Contains(inMessage, SorKey) && !strings.Contains(inMessage, SorKey2) {
 		return ""
 	}

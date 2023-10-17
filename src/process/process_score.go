@@ -33,7 +33,7 @@ type ProjectDetail struct {
 
 const ScoreKey = "rank-"
 
-func Rank(db *gorm.DB, core core.Core, inMessage string) (outMessage string) {
+func Rank(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessage string) {
 	inMessage = strings.ReplaceAll(inMessage, " ", "")
 	if !strings.HasPrefix(inMessage, ScoreKey) {
 		return ""

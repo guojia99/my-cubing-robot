@@ -9,7 +9,7 @@ import (
 
 const NvHaoHaoKey = "女装"
 
-func NvHaoHao(db *gorm.DB, core core.Core, inMessage string) (outMessage string) {
+func NvHaoHao(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessage string) {
 	if !strings.HasPrefix(inMessage, NvHaoHaoKey) {
 		return ""
 	}

@@ -6,17 +6,16 @@ import (
 )
 
 type (
-	ProcessFn func(db *gorm.DB, core core.Core, inMessage string) (outMessage string)
+	ProcessFn func(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessage string)
 )
 
 var ProcessDict = []ProcessFn{
 	Rank,
 	Sor,
 	Contest,
+	AddPreScore,
 	PK,
 	Help,
 	NvHaoHao,
-
-	// player查询永久垫底
 	Player,
 }

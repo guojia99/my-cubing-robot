@@ -10,14 +10,14 @@ import (
 const HelpKey = "help"
 const HelpKey2 = "帮助"
 
-func Help(db *gorm.DB, core core.Core, inMessage string) (outMessage string) {
+func Help(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessage string) {
 
 	if !(len(inMessage) == 0 || strings.Contains(inMessage, HelpKey) || strings.Contains(inMessage, HelpKey2)) {
 		return ""
 	}
 
 	outMessage = `--------- 使用帮助 -----------
-1、选手查询: "*{选手名称}" 或 "*选手 {选手名称}"
+1、选手查询: "*选手 {选手名称}"
 2、单项目查询: "*rank-{项目名}"
 3、排位分查询: "*sor-{排位项}" 或者 "*sor{排位项}" 
 排位项目: 全项目,wca,趣味,xcube,二至五,wca2345,二至七,wca234567,异形,wca_alien,全三阶,wca333,盲拧,wca_bf

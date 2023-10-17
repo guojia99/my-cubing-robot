@@ -3,6 +3,9 @@ package utils
 import (
 	"fmt"
 	"math"
+	"regexp"
+	"strconv"
+	"strings"
 
 	"github.com/guojia99/my-cubing-core/model"
 )
@@ -39,4 +42,37 @@ func TimeParser(score model.Score, isAvg bool) string {
 	}
 
 	return fmt.Sprintf("%d:%s", m, ss)
+}
+
+func ParserTimeToSeconds(t string) float64 {
+	if t == "DNF" || strings.ContainsAny(t, "dD") {
+		return model.DNF
+	}
+	if t == "DNS" || strings.Contains(t, "s") {
+		return model.DNS
+	}
+	// 解析纯秒数格式
+	if regexp.MustCompile(`^\d+(\.\d+)?$`).MatchString(t) {
+		seconds, _ := strconv.ParseFloat(t, 64)
+		return seconds
+	}
+
+	// 解析分+秒格式
+	if regexp.MustCompile(`^\d{1,2}[:：]\d{2}(\.\d+)?$`).MatchString(t) {
+		parts := strings.Split(t, ":")
+		minutes, _ := strconv.ParseFloat(parts[0], 64)
+		seconds, _ := strconv.ParseFloat(parts[1], 64)
+		return minutes*60 + seconds
+	}
+
+	// 解析时+分+秒格式
+	if regexp.MustCompile(`^\d{1,2}[:：]\d{2}[:：]\d{3}(\.\d+)?$`).MatchString(t) {
+		parts := strings.Split(t, ":")
+		hours, _ := strconv.ParseFloat(parts[0], 64)
+		minutes, _ := strconv.ParseFloat(parts[1], 64)
+		seconds, _ := strconv.ParseFloat(parts[2], 64)
+		return hours*3600 + minutes*60 + seconds
+	}
+
+	return model.DNF
 }

@@ -32,9 +32,12 @@ func getPlayerList(db *gorm.DB) []string {
 
 const PlayerKey = "选手"
 
-func Player(db *gorm.DB, core core.Core, inMessage string) (outMessage string) {
-	inMessage = strings.ReplaceAll(inMessage, PlayerKey, "")
+func Player(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessage string) {
+	if !strings.HasPrefix(inMessage, PlayerKey) {
+		return ""
+	}
 
+	inMessage = strings.ReplaceAll(inMessage, PlayerKey, "")
 	if len(inMessage) > 20 || len(inMessage) == 0 {
 		return
 	}
