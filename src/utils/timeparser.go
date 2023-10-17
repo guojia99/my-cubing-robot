@@ -58,7 +58,7 @@ func ParserTimeToSeconds(t string) float64 {
 	}
 
 	// 解析分+秒格式
-	if regexp.MustCompile(`^\d{1,2}[:：]\d{2}(\.\d+)?$`).MatchString(t) {
+	if regexp.MustCompile(`^\d{1,3}:\d{1,3}(\.\d+)?$`).MatchString(t) {
 		parts := strings.Split(t, ":")
 		minutes, _ := strconv.ParseFloat(parts[0], 64)
 		seconds, _ := strconv.ParseFloat(parts[1], 64)
@@ -66,7 +66,7 @@ func ParserTimeToSeconds(t string) float64 {
 	}
 
 	// 解析时+分+秒格式
-	if regexp.MustCompile(`^\d{1,2}[:：]\d{2}[:：]\d{3}(\.\d+)?$`).MatchString(t) {
+	if regexp.MustCompile(`^\d{1,3}:\d{1,3}:\d{1,3}(\.\d+)?$`).MatchString(t) {
 		parts := strings.Split(t, ":")
 		hours, _ := strconv.ParseFloat(parts[0], 64)
 		minutes, _ := strconv.ParseFloat(parts[1], 64)
