@@ -65,7 +65,7 @@ func Rank(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessage 
 		outMessage += "\n"
 	}
 
-	outMessage += fmt.Sprintf("详情请查看: http://mycube.club/statistics/best?tabs=best_all&cubes=%s", pj)
+	outMessage += fmt.Sprintf("详情请查看: http://www.mycube.club/statistics/best?tabs=best_all&cubes=%s", pj)
 
 	return outMessage
 }

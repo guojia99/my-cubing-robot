@@ -32,6 +32,11 @@ func Test__getProject(t *testing.T) {
 			in:   "    ",
 			want: model.Project(""),
 		},
+		{
+			name: "二阶五魔",
+			in:   "二阶五魔 1, 2, 3",
+			want: model.XCube222Minx,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

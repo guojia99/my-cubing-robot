@@ -69,7 +69,7 @@ func Sor(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessage s
 	a := allAvg[key]
 
 	outMessage = fmt.Sprintf("--------- Sor %s ----------\n", key)
-	outMessage += fmt.Sprintf("详情请查看 :http://mycube.club/statistics/sor?sor_tabs=%s\n", key)
+	outMessage += fmt.Sprintf("详情请查看 :http://www.mycube.club/statistics/sor?sor_tabs=%s\n", key)
 	for idx, best := range b {
 		if idx >= 10 {
 			break

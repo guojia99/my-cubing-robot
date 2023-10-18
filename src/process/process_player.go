@@ -81,7 +81,7 @@ func Player(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessag
 
 	outMessage = player.Name + "\n"
 	outMessage += "----------- 个人主页 -----------\n"
-	outMessage += fmt.Sprintf("http://mycube.club/player?id=%d\n", player.ID)
+	outMessage += fmt.Sprintf("http://www.mycube.club/player?id=%d\n", player.ID)
 	// 成绩渲染函数
 	score := func(pj model.Project) string {
 		best, ok := bestAll[pj]

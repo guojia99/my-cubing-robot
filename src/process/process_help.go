@@ -26,7 +26,7 @@ func Help(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessage 
 6、比赛详细内容查询: "*contest-{比赛名称}-sor-{排位项}", "*contest-{比赛名称}-rank-{项目名}", "*contest-{比赛名称}-record"
 --------- 温馨提示 -----------
 1、请在使用时切勿反复刷新,遇到卡顿时可能是限流导致,机器人响应也会做一定的限制,所以不要反复发送指令
-2、机器人仅提供部分方便的成绩查询, 详细内容请访问官网 http://mycube.club
+2、机器人仅提供部分方便的成绩查询, 详细内容请访问官网 http://www.mycube.club
 3、看到这条消息，请催浩浩女装
 `
 

@@ -18,4 +18,5 @@ var ProcessDict = []ProcessFn{
 	Help,
 	NvHaoHao,
 	Player,
+	Projects,
 }

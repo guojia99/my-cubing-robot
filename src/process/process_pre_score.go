@@ -125,6 +125,16 @@ func _preScoresParser(db *gorm.DB, contest model.Contest, inMessage string) ([]c
 	return preScores, nil
 }
 
+var pjMap = func() map[string]model.Project {
+	var out = make(map[string]model.Project)
+
+	for _, pj := range model.AllProjectRoute() {
+		out[pj.Cn()] = pj
+		out[string(pj)] = pj
+	}
+	return out
+}()
+
 func _getProject(in string) model.Project {
 	// 333 1.1,1.2,1:03.10,DNF,DNS
 	for {
@@ -138,10 +148,12 @@ func _getProject(in string) model.Project {
 		break
 	}
 
-	for _, pj := range model.AllProjectRoute() {
-		if strings.HasPrefix(in, pj.Cn()) || strings.HasPrefix(in, string(pj)) {
-			return pj
-		}
+	split := strings.Split(in, " ")
+	if len(split) == 0 {
+		return ""
 	}
-	return ""
+
+	key := split[0]
+	val, _ := pjMap[key]
+	return val
 }
