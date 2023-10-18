@@ -27,8 +27,13 @@ const AddPreScoreKey2 = "录入-"
 */
 
 func AddPreScore(db *gorm.DB, core coreModel.Core, inMessage string, qq string) (outMessage string) {
-
+	inMessage = strings.ReplaceAll(inMessage, "\n", "")
+	inMessage = strings.ReplaceAll(inMessage, "：", ":")
+	inMessage = strings.ReplaceAll(inMessage, "，", ",")
+	inMessage = strings.ReplaceAll(inMessage, "\\", "/")
+	inMessage = strings.ReplaceAll(inMessage, "。", ".")
 	fmt.Println(inMessage)
+
 	if strings.HasPrefix(inMessage, AddPreScoreKey2) {
 		return "暂不支持详细录入"
 	}
@@ -101,13 +106,27 @@ func _preScoresParser(db *gorm.DB, contest model.Contest, inMessage string) ([]c
 		// 移除所有成绩无关内容
 		cache := strings.ReplaceAll(score, string(pj), "")
 		cache = strings.ReplaceAll(cache, pj.Cn(), "")
-		cache = strings.ReplaceAll(cache, " ", "")
 
-		ss := strings.Split(cache, ",")
+		// 解析成绩分隔断
+		var ss []string
+		if strings.Contains(cache, ",") {
+			cache = strings.ReplaceAll(cache, " ", "")
+			ss = strings.Split(cache, ",")
+		} else {
+			ss = strings.Split(cache, " ")
+		}
+		var newSs []string
+		for _, val := range ss {
+			if len(val) > 0 {
+				newSs = append(newSs, val)
+			}
+		}
+		ss = newSs
 		if len(ss) == 0 {
 			return nil, fmt.Errorf("`%s` 无法执行无成绩的内容", score)
 		}
 
+		// 数据处理
 		var preScore = coreModel.AddPreScoreRequest{
 			AddScoreRequest: coreModel.AddScoreRequest{
 				Project: pj,
