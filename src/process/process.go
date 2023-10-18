@@ -15,8 +15,8 @@ var ProcessDict = []ProcessFn{
 	Contest,
 	AddPreScore,
 	PK,
-	Help,
 	NvHaoHao,
 	Player,
 	Projects,
+	Help,
 }
