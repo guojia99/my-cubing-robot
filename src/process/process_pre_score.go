@@ -27,10 +27,14 @@ const AddPreScoreKey2 = "录入-"
 */
 
 func AddPreScore(db *gorm.DB, core coreModel.Core, inMessage string, qq string) (outMessage string) {
+
+	fmt.Println(inMessage)
 	if strings.HasPrefix(inMessage, AddPreScoreKey2) {
 		return "暂不支持详细录入"
 	}
+
 	if strings.HasPrefix(inMessage, AddPreScoreKey) {
+
 		return _simpleAddPreScore(db, core, inMessage, qq)
 	}
 	return ""
@@ -75,6 +79,7 @@ func _simpleAddPreScore(db *gorm.DB, core coreModel.Core, inMessage string, qq s
 
 func _preScoresParser(db *gorm.DB, contest model.Contest, inMessage string) ([]coreModel.AddPreScoreRequest, error) {
 	scores := strings.Split(inMessage, "/")
+	fmt.Println(scores)
 	if len(scores) == 0 {
 		return nil, errors.New("请输入正确的录入:\n 如：*录入 333 1.1,1.2,1:03.10,DNF,DNS")
 	}

@@ -54,7 +54,7 @@ func (c *Client) Run() {
 		_ = ctx.Bind(&r)
 
 		ctx.JSON(http.StatusOK, gin.H{})
-		if r.GroupId == 0 || len(r.Message) == 0 || len(r.Message) > 40 {
+		if r.GroupId == 0 || len(r.Message) == 0 || r.Message[0] != '*' {
 			return
 		}
 		c.inCh <- r
@@ -80,9 +80,6 @@ func (c *Client) listenInputMessage() {
 	for {
 		select {
 		case data := <-c.inCh:
-			if data.Message[0] != '*' {
-				continue
-			}
 			msg := data.Message[1:]
 			for _, fn := range c.processFns {
 				if out := fn(c.db, c.core, msg, fmt.Sprintf("%d", data.UserId)); len(out) > 0 {
