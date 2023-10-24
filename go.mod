@@ -4,10 +4,10 @@ go 1.20
 
 require (
 	github.com/gin-gonic/gin v1.9.1
-	github.com/guojia99/my-cubing-core v0.1.28
+	github.com/guojia99/my-cubing-core v0.2.0
 	github.com/json-iterator/go v1.1.12
 	github.com/spf13/cobra v1.7.0
-	gorm.io/driver/mysql v1.5.1
+	gorm.io/driver/mysql v1.5.2
 	gorm.io/driver/sqlite v1.5.2
 	gorm.io/gorm v1.25.4
 )
