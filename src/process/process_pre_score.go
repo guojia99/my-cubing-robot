@@ -55,7 +55,7 @@ func _simpleAddPreScore(db *gorm.DB, core coreModel.Core, inMessage string, qq s
 	}
 
 	var player model.Player
-	_ = db.Where("id = ?", playerUser.ID).First(&player)
+	_ = db.Where("id = ?", playerUser.PlayerID).First(&player)
 
 	var contest model.Contest
 	if err := db.Where("is_end = ?", false).Where("name like ?", fmt.Sprintf("%%%s%%", "群赛")).First(&contest).Error; err != nil {
