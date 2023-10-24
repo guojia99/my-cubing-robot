@@ -34,7 +34,7 @@ func GetNotPlayerProject(db *gorm.DB, core coreModel.Core, inMessage string, qq 
 	}
 
 	playerContest, _ := core.GetScoreByPlayerContest(playerUser.PlayerID, contest.ID)
-	var cache map[model.Project]struct{}
+	var cache = make(map[model.Project]struct{})
 	for _, val := range playerContest {
 		cache[val.Project] = struct{}{}
 	}
