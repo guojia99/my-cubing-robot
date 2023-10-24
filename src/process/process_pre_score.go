@@ -32,14 +32,12 @@ func AddPreScore(db *gorm.DB, core coreModel.Core, inMessage string, qq string) 
 	inMessage = strings.ReplaceAll(inMessage, "，", ",")
 	inMessage = strings.ReplaceAll(inMessage, "\\", "/")
 	inMessage = strings.ReplaceAll(inMessage, "。", ".")
-	fmt.Println(inMessage)
 
 	if strings.HasPrefix(inMessage, AddPreScoreKey2) {
 		return "暂不支持详细录入"
 	}
 
 	if strings.HasPrefix(inMessage, AddPreScoreKey) {
-
 		return _simpleAddPreScore(db, core, inMessage, qq)
 	}
 	return ""
@@ -55,6 +53,9 @@ func _simpleAddPreScore(db *gorm.DB, core coreModel.Core, inMessage string, qq s
 	if err := db.Where("qq = ?", qq).First(&playerUser).Error; err != nil {
 		return fmt.Sprintf("`%s` 未登记，请联系浩浩登记", qq)
 	}
+
+	var player model.Player
+	_ = db.Where("id = ?", playerUser.ID).First(&player)
 
 	var contest model.Contest
 	if err := db.Where("is_end = ?", false).Where("name like ?", fmt.Sprintf("%%%s%%", "群赛")).First(&contest).Error; err != nil {
@@ -74,9 +75,9 @@ func _simpleAddPreScore(db *gorm.DB, core coreModel.Core, inMessage string, qq s
 		val.Recorder = qq
 
 		if err = core.AddPreScore(val); err != nil {
-			out += fmt.Sprintf("%s 录入失败： %s\n", val.Project.Cn(), err)
+			out += fmt.Sprintf("%s %s 录入失败： %s\n", player.Name, val.Project.Cn(), err)
 		} else {
-			out += fmt.Sprintf("%s 录入成功！\n", val.Project.Cn())
+			out += fmt.Sprintf("%s %s 录入成功！\n", player.Name, val.Project.Cn())
 		}
 	}
 	return out
