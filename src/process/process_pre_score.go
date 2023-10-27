@@ -51,6 +51,7 @@ func AddPreScore(db *gorm.DB, core coreModel.Core, inMessage string, qq string) 
 		if err := db.Where("id = ?", id).Where("is_end = ?", false).First(&contest).Error; err != nil {
 			return "比赛不存在或未开启、已结束"
 		}
+		inMessage = strings.ReplaceAll(inMessage[1:], fmt.Sprintf("%d", id), "")
 		return _simpleAddPreScore(db, core, contest, inMessage, qq)
 	}
 
