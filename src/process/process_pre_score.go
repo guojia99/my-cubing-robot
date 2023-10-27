@@ -3,6 +3,8 @@ package process
 import (
 	"errors"
 	"fmt"
+	"regexp"
+	"strconv"
 	"strings"
 
 	coreModel "github.com/guojia99/my-cubing-core"
@@ -14,7 +16,6 @@ import (
 )
 
 const AddPreScoreKey = "录入"
-const AddPreScoreKey2 = "录入-"
 
 /*
 1, 快速录入（多个录入用  / 分开）：
@@ -27,28 +28,42 @@ const AddPreScoreKey2 = "录入-"
 */
 
 func AddPreScore(db *gorm.DB, core coreModel.Core, inMessage string, qq string) (outMessage string) {
+	if !strings.HasPrefix(inMessage, AddPreScoreKey) {
+		return ""
+	}
+	inMessage = strings.ReplaceAll(inMessage, AddPreScoreKey, "")
 	inMessage = strings.ReplaceAll(inMessage, "\n", "")
 	inMessage = strings.ReplaceAll(inMessage, "：", ":")
 	inMessage = strings.ReplaceAll(inMessage, "，", ",")
 	inMessage = strings.ReplaceAll(inMessage, "\\", "/")
 	inMessage = strings.ReplaceAll(inMessage, "。", ".")
 
-	if strings.HasPrefix(inMessage, AddPreScoreKey2) {
-		return "暂不支持详细录入"
+	if len(inMessage) <= 1 {
+		return "无效的输入"
+	}
+	var contest model.Contest
+	if inMessage[0] == '-' {
+		num := _getNumbers(inMessage[1:])
+		if len(num) == 0 {
+			return "输入无效的比赛"
+		}
+		id := int(num[0])
+		if err := db.Where("id = ?", id).Where("is_end = ?", false).First(&contest).Error; err != nil {
+			return "比赛不存在或未开启、已结束"
+		}
+		return _simpleAddPreScore(db, core, contest, inMessage, qq)
 	}
 
-	if strings.HasPrefix(inMessage, AddPreScoreKey) {
-		return _simpleAddPreScore(db, core, inMessage, qq)
+	if err := db.Where("is_end = ?", false).Where("name like ?", fmt.Sprintf("%%%s%%", "群赛")).First(&contest).Error; err != nil {
+		return "没有开启最新的群赛，请联系浩浩开启"
 	}
-	return ""
+	return _simpleAddPreScore(db, core, contest, inMessage, qq)
 }
 
-func _simpleAddPreScore(db *gorm.DB, core coreModel.Core, inMessage string, qq string) (outMessage string) {
+func _simpleAddPreScore(db *gorm.DB, core coreModel.Core, contest model.Contest, inMessage string, qq string) (outMessage string) {
 	// 1, 快速录入（多个录入用  / 分开）：
 	//*录入  333 1.1,1.2,1:03.10,DNF,DNS
 	//*录入   333 1.1,1.2,1:03.10,DNF,DNS  / 444 1.2,1.3,1.2,1.2,1.43 / ....
-	inMessage = strings.ReplaceAll(inMessage, AddPreScoreKey, "")
-
 	var playerUser model.PlayerUser
 	if err := db.Where("qq = ?", qq).First(&playerUser).Error; err != nil {
 		return fmt.Sprintf("`%s` 未登记，请联系浩浩登记", qq)
@@ -56,11 +71,6 @@ func _simpleAddPreScore(db *gorm.DB, core coreModel.Core, inMessage string, qq s
 
 	var player model.Player
 	_ = db.Where("id = ?", playerUser.PlayerID).First(&player)
-
-	var contest model.Contest
-	if err := db.Where("is_end = ?", false).Where("name like ?", fmt.Sprintf("%%%s%%", "群赛")).First(&contest).Error; err != nil {
-		return "没有开启最新的群赛，请联系浩浩开启"
-	}
 
 	preScores, err := _preScoresParser(db, contest, inMessage)
 	if err != nil {
@@ -181,4 +191,18 @@ func _getProject(in string) model.Project {
 	key := split[0]
 	val, _ := pjMap[key]
 	return val
+}
+
+func _getNumbers(in string) []float64 {
+	re := regexp.MustCompile("(-?\\d+)(\\.\\d+)?")
+	numbers := re.FindAllString(in, -1)
+
+	var out []float64
+	for _, num := range numbers {
+		f, err := strconv.ParseFloat(num, 64)
+		if err == nil {
+			out = append(out, f)
+		}
+	}
+	return out
 }
