@@ -91,12 +91,16 @@ func Player(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessag
 		}
 
 		out := ""
-		out += fmt.Sprintf("%s %s",
+		out += fmt.Sprintf("%s (%d) %s",
 			utils.TB(pj.Cn()+":", 5),
+			best.Rank,
 			utils.TB(utils.TimeParser(best.Score, false), 4),
 		)
 		if ok2 {
-			out += fmt.Sprintf(" | %s", utils.TB(utils.TimeParser(avg.Score, true), 4))
+			out += fmt.Sprintf(" | %s (%d)",
+				utils.TB(utils.TimeParser(avg.Score, true), 4),
+				avg.Score.Rank,
+			)
 		}
 		return out + "\n"
 	}
