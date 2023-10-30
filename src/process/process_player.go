@@ -128,20 +128,20 @@ func Player(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessag
 	}
 	outMessage += wcaOut + xcubeOut
 
-	// 渲染排位
-	signalSor, avgSor := core.GetPlayerSor(player.ID)
-	sorOut := "----------- 排位分数 -----------\n"
-	sorOut += "项目    排名 单次  || 平均 排名\n"
-	for _, val := range sorKeys {
-		sorOut += fmt.Sprintf("%s\t %s %s || %s %s\n",
-			utils.TB(SorCn[val], 3),
-			utils.TB(signalSor[val].SingleRank, 2),
-			utils.TB(signalSor[val].SingleCount, 2),
-			utils.TB(avgSor[val].AvgCount, 2),
-			utils.TB(avgSor[val].AvgRank, 2),
-		)
-	}
-	outMessage += sorOut
+	//// 渲染排位
+	//signalSor, avgSor := core.GetPlayerSor(player.ID)
+	//sorOut := "----------- 排位分数 -----------\n"
+	//sorOut += "项目    排名 单次  || 平均 排名\n"
+	//for _, val := range sorKeys {
+	//	sorOut += fmt.Sprintf("%s\t %s %s || %s %s\n",
+	//		utils.TB(SorCn[val], 3),
+	//		utils.TB(signalSor[val].SingleRank, 2),
+	//		utils.TB(signalSor[val].SingleCount, 2),
+	//		utils.TB(avgSor[val].AvgCount, 2),
+	//		utils.TB(avgSor[val].AvgRank, 2),
+	//	)
+	//}
+	//outMessage += sorOut
 
 	return outMessage
 }

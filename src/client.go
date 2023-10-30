@@ -82,7 +82,14 @@ func (c *Client) listenInputMessage() {
 		case data := <-c.inCh:
 			msg := data.Message[1:]
 			for _, fn := range c.processFns {
+				ts := time.Now()
 				if out := fn(c.db, c.core, msg, fmt.Sprintf("%d", data.UserId)); len(out) > 0 {
+
+					useTime := fmt.Sprintf("\n(耗时: %s)", time.Now().Sub(ts).String())
+					if time.Now().Sub(ts) > time.Second {
+						out += useTime
+					}
+
 					c.outCh <- model.SendMessage{
 						GroupId: data.GroupId,
 						Message: out,
