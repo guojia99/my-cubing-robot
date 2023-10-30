@@ -29,6 +29,9 @@ func TimeParser(score model.Score, isAvg bool) string {
 	if isAvg {
 		in = score.Avg
 	}
+	if in <= model.DNF {
+		return "DNF"
+	}
 
 	if in < 60 {
 		return fmt.Sprintf("%0.2f", in)

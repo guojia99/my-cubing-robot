@@ -91,21 +91,12 @@ func Player(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessag
 		}
 
 		out := ""
-		if pj.RouteType() == model.RouteTypeRepeatedly {
-			out += fmt.Sprintf("%s %s / %s %s",
-				utils.TB(pj.Cn()+":", 5),
-				fmt.Sprintf("%.0f", best.Score.Result1),
-				fmt.Sprintf("%.0f", best.Score.Result2),
-				utils.TB(utils.TimeParser(best.Score, false), 4),
-			)
-		} else {
-			out += fmt.Sprintf("%s %s",
-				utils.TB(pj.Cn()+":", 5),
-				utils.TB(utils.TimeParser(best.Score, false), 4),
-			)
-			if ok2 {
-				out += fmt.Sprintf(" | %s", utils.TB(utils.TimeParser(avg.Score, true), 4))
-			}
+		out += fmt.Sprintf("%s %s",
+			utils.TB(pj.Cn()+":", 5),
+			utils.TB(utils.TimeParser(best.Score, false), 4),
+		)
+		if ok2 {
+			out += fmt.Sprintf(" | %s", utils.TB(utils.TimeParser(avg.Score, true), 4))
 		}
 		return out + "\n"
 	}
