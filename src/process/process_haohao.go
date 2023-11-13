@@ -43,5 +43,5 @@ func NvHaoHao(db *gorm.DB, core core.Core, inMessage string, qq string) (outMess
 	if !strings.HasPrefix(inMessage, NvHaoHaoKey) {
 		return
 	}
-	return "女装浩赶紧女装", ""
+	return "女装浩赶紧女装", autoImage()
 }

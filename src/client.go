@@ -144,8 +144,9 @@ func (c *Client) sendMessage(groupId int, qqId int, message string, imagePath st
 
 	_, err := utils.HTTPRequest(
 		"POST", "http://127.0.0.1:5700/send_group_msg", nil, nil, model.SendMessage{
-			GroupId: groupId,
-			Message: message,
+			GroupId:    groupId,
+			Message:    message,
+			AutoEscape: false,
 		},
 	)
 	return err

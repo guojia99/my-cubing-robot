@@ -56,8 +56,9 @@ type MessageST struct {
 }
 
 type SendMessage struct {
-	GroupId int    `json:"group_id"`
-	QQId    int    `json:"-"`
-	Image   string `json:"-"`
-	Message string `json:"message"`
+	GroupId    int    `json:"group_id"`
+	QQId       int    `json:"-"`
+	Image      string `json:"-"`
+	Message    string `json:"message"`
+	AutoEscape bool   `json:"auto_escape"`
 }
