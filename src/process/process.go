@@ -6,7 +6,7 @@ import (
 )
 
 type (
-	ProcessFn func(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessage string)
+	ProcessFn func(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessage string, image string)
 )
 
 var ProcessDict = []ProcessFn{

@@ -10,10 +10,10 @@ import (
 const HelpKey = "help"
 const HelpKey2 = "帮助"
 
-func Help(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessage string) {
+func Help(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessage string, outImage string) {
 
 	if !(len(inMessage) == 0 || strings.Contains(inMessage, HelpKey) || strings.Contains(inMessage, HelpKey2)) {
-		return ""
+		return
 	}
 
 	outMessage = `--------- 使用帮助 -----------
@@ -31,7 +31,7 @@ func Help(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessage 
 3、看到这条消息，请催浩浩女装
 `
 
-	return outMessage
+	return outMessage, ""
 }
 
 // 5、比赛查询: "*contest-{比赛名称}", 如果添加比赛名称则输出比赛列表

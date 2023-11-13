@@ -14,9 +14,9 @@ import (
 const star = "★ "
 const PkKey = "PK"
 
-func PK(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessage string) {
+func PK(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessage string, outImage string) {
 	if !strings.HasPrefix(strings.ToUpper(inMessage), PkKey) {
-		return ""
+		return
 	}
 
 	inMessage = strings.ReplaceAll(inMessage, PkKey, "")
@@ -24,17 +24,17 @@ func PK(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessage st
 
 	data := strings.Split(inMessage, "vs")
 	if len(data) < 2 {
-		return "请输入两位选手 *PK {选手1} vs {选手2}"
+		return "请输入两位选手 *PK {选手1} vs {选手2}", ""
 	}
 
 	name1, name2 := strings.ReplaceAll(data[0], " ", ""), strings.ReplaceAll(data[1], " ", "")
 
 	var player1, player2 model.Player
 	if db.Where("name = ?", name1).First(&player1); player1.ID == 0 {
-		return fmt.Sprintf("找不到选手`%s`", name1)
+		return fmt.Sprintf("找不到选手`%s`", name1), ""
 	}
 	if db.Where("name = ?", name2).First(&player2); player2.ID == 0 {
-		return fmt.Sprintf("找不到选手`%s`", name2)
+		return fmt.Sprintf("找不到选手`%s`", name2), ""
 	}
 
 	outMessage = fmt.Sprintf("%s VS %s\n", player1.Name, player2.Name)
@@ -105,5 +105,5 @@ func PK(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessage st
 		outMessage += fmt.Sprintf("%d vs %d 胜利 %s\n", p1Count, p2Count, star)
 	}
 
-	return outMessage
+	return outMessage, ""
 }

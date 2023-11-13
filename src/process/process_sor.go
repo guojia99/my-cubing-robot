@@ -49,9 +49,9 @@ var sorKeyMap = map[string]model.SorStatisticsKey{
 const SorKey = "sor-"
 const SorKey2 = "sor"
 
-func Sor(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessage string) {
+func Sor(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessage string, outImage string) {
 	if !strings.Contains(inMessage, SorKey) && !strings.Contains(inMessage, SorKey2) {
-		return ""
+		return
 	}
 
 	in := strings.ReplaceAll(inMessage, SorKey, "")
@@ -79,5 +79,5 @@ func Sor(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessage s
 		outMessage += fmt.Sprintf(" || %d %s\n", a[idx].AvgCount, a[idx].Player.Name)
 	}
 
-	return outMessage
+	return outMessage, ""
 }

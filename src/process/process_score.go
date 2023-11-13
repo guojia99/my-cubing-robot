@@ -33,21 +33,21 @@ type ProjectDetail struct {
 
 const ScoreKey = "rank-"
 
-func Rank(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessage string) {
+func Rank(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessage string, outImage string) {
 	inMessage = strings.ReplaceAll(inMessage, " ", "")
 	if !strings.HasPrefix(inMessage, ScoreKey) {
-		return ""
+		return
 	}
 
 	pj := getProjectString(strings.ReplaceAll(inMessage, ScoreKey, ""))
 	if pj == "" {
-		return ""
+		return
 	}
 
 	allBest, allAvg := core.GetBestScore()
 	bests, ok := allBest[pj]
 	if !ok || len(bests) == 0 {
-		return "该项目无人参加, 欢迎积极参赛"
+		return "该项目无人参加, 欢迎积极参赛", ""
 	}
 
 	avgs, ok := allAvg[pj]
@@ -67,5 +67,5 @@ func Rank(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessage 
 
 	outMessage += fmt.Sprintf("详情请查看: http://www.mycube.club/statistics/best?tabs=best_all&cubes=%s", pj)
 
-	return outMessage
+	return outMessage, ""
 }

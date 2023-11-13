@@ -49,16 +49,18 @@ func NewClient(config string) (*Client, error) {
 }
 
 func (c *Client) Run() {
-	c.e.NoRoute(func(ctx *gin.Context) {
-		var r model.Message
-		_ = ctx.Bind(&r)
+	c.e.NoRoute(
+		func(ctx *gin.Context) {
+			var r model.Message
+			_ = ctx.Bind(&r)
 
-		ctx.JSON(http.StatusOK, gin.H{})
-		if r.GroupId == 0 || len(r.Message) == 0 || r.Message[0] != '*' {
-			return
-		}
-		c.inCh <- r
-	})
+			ctx.JSON(http.StatusOK, gin.H{})
+			if r.GroupId == 0 || len(r.Message) == 0 || r.Message[0] != '*' {
+				return
+			}
+			c.inCh <- r
+		},
+	)
 
 	go c.listenInputMessage()
 	go c.listenOutPutMessage()
@@ -83,8 +85,7 @@ func (c *Client) listenInputMessage() {
 			msg := data.Message[1:]
 			for _, fn := range c.processFns {
 				ts := time.Now()
-				if out := fn(c.db, c.core, msg, fmt.Sprintf("%d", data.UserId)); len(out) > 0 {
-
+				if out, outImage := fn(c.db, c.core, msg, fmt.Sprintf("%d", data.UserId)); len(out) > 0 {
 					useTime := fmt.Sprintf("\n(耗时: %s)", time.Now().Sub(ts).String())
 					if time.Now().Sub(ts) > time.Second {
 						out += useTime
@@ -92,6 +93,8 @@ func (c *Client) listenInputMessage() {
 
 					c.outCh <- model.SendMessage{
 						GroupId: data.GroupId,
+						QQId:    data.UserId,
+						Image:   outImage,
 						Message: out,
 					}
 					break
@@ -105,7 +108,7 @@ func (c *Client) listenOutPutMessage() {
 	for {
 		select {
 		case data := <-c.outCh:
-			err := c.sendMessage(data.GroupId, data.Message)
+			err := c.sendMessage(data.GroupId, data.QQId, data.Message, data.Image)
 			if err == nil {
 				time.Sleep(time.Second * 2)
 				break
@@ -119,9 +122,15 @@ func init() {
 	//log.SetOutput(f)
 }
 
-func (c *Client) sendMessage(groupId int, message string) error {
+// 截至目前本周赛果如下:http://www.mycube.club/contest?id=34&amp;score_cubes=score_pyram&amp;contest_tab=tab_nav_all_score_table[CQ:image,file=529e67c79b3679fbcb1b39ac21cb06e3.image,subType=0,url=https://gchat.qpic.cn/gchatpic_new/415230487/532463339-3056437820-529E67C79B3679FBCB1B39AC21CB06E3/0?term=2&amp;is_origin=0] (-1805831072)
+
+func (c *Client) sendMessage(groupId int, qqId int, message string, imageBase string) error {
 	if message[len(message)-1] == '\n' {
 		message = message[:len(message)-1]
+	}
+
+	if qqId != 0 {
+		message = fmt.Sprintf("[CQ:at,qq=%d]", qqId) + message
 	}
 
 	if c.cfg.NotMessage {
@@ -129,9 +138,15 @@ func (c *Client) sendMessage(groupId int, message string) error {
 		return nil
 	}
 
-	_, err := utils.HTTPRequest("POST", "http://127.0.0.1:5700/send_group_msg", nil, nil, model.SendMessage{
-		GroupId: groupId,
-		Message: message,
-	})
+	if imageBase != "" {
+		message += fmt.Sprintf("[CQ:image,subType=0,type=show,file=base64://%s]", imageBase)
+	}
+
+	_, err := utils.HTTPRequest(
+		"POST", "http://127.0.0.1:5700/send_group_msg", nil, nil, model.SendMessage{
+			GroupId: groupId,
+			Message: message,
+		},
+	)
 	return err
 }

@@ -32,9 +32,9 @@ func getPlayerList(db *gorm.DB) []string {
 
 const PlayerKey = "选手"
 
-func Player(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessage string) {
+func Player(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessage string, outImage string) {
 	if !strings.HasPrefix(inMessage, PlayerKey) {
-		return ""
+		return "", ""
 	}
 
 	inMessage = strings.ReplaceAll(inMessage, PlayerKey, "")
@@ -67,11 +67,11 @@ func Player(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessag
 			for _, val := range players {
 				outMessage += fmt.Sprintf("%d、%s\n", val.ID, val.Name)
 			}
-			return outMessage
+			return outMessage, ""
 		}
 		if len(players) == 0 {
 			outMessage = "查询不到数据\n"
-			return outMessage
+			return outMessage, ""
 		}
 		player = players[0]
 	}
@@ -91,13 +91,15 @@ func Player(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessag
 		}
 
 		out := ""
-		out += fmt.Sprintf("%s (%d) %s",
+		out += fmt.Sprintf(
+			"%s (%d) %s",
 			utils.TB(pj.Cn()+":", 5),
 			best.Rank,
 			utils.TB(utils.TimeParser(best.Score, false), 4),
 		)
 		if ok2 {
-			out += fmt.Sprintf(" | %s (%d)",
+			out += fmt.Sprintf(
+				" | %s (%d)",
 				utils.TB(utils.TimeParser(avg.Score, true), 4),
 				avg.Score.Rank,
 			)
@@ -138,7 +140,7 @@ func Player(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessag
 	//}
 	//outMessage += sorOut
 
-	return outMessage
+	return outMessage, ""
 }
 
 var wcaRoute = func() []model.Project {

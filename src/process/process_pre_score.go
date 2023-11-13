@@ -27,9 +27,9 @@ const AddPreScoreKey = "录入"
 *录入-{比赛ID}  {项目名}({轮次})  {成绩1}(判罚列表...), {成绩2}(判罚列表...), {成绩3}(判罚列表...), ...
 */
 
-func AddPreScore(db *gorm.DB, core coreModel.Core, inMessage string, qq string) (outMessage string) {
+func AddPreScore(db *gorm.DB, core coreModel.Core, inMessage string, qq string) (outMessage string, outImage string) {
 	if !strings.HasPrefix(inMessage, AddPreScoreKey) {
-		return ""
+		return
 	}
 	inMessage = strings.ReplaceAll(inMessage, AddPreScoreKey, "")
 	inMessage = strings.ReplaceAll(inMessage, "\n", "")
@@ -39,7 +39,7 @@ func AddPreScore(db *gorm.DB, core coreModel.Core, inMessage string, qq string) 
 	inMessage = strings.ReplaceAll(inMessage, "。", ".")
 
 	if len(inMessage) <= 1 {
-		return "无效的输入"
+		return "无效的输入", ""
 	}
 	var contest model.Contest
 	if inMessage[0] == '-' {
@@ -47,17 +47,17 @@ func AddPreScore(db *gorm.DB, core coreModel.Core, inMessage string, qq string) 
 			id := int(num[0])
 			if err := db.Where("id = ?", id).Where("is_end = ?", false).First(&contest).Error; err == nil {
 				inMessage = strings.ReplaceAll(inMessage[1:], fmt.Sprintf("%d", id), "")
-				return _simpleAddPreScore(db, core, contest, inMessage, qq)
+				return _simpleAddPreScore(db, core, contest, inMessage, qq), ""
 			}
 		}
-		return "输入无效的比赛或找不到该比赛"
+		return "输入无效的比赛或找不到该比赛", ""
 	}
 
 	if err := db.Where("is_end = ?", false).Where("name like ?", fmt.Sprintf("%%%s%%", "群赛")).First(&contest).Error; err == nil {
-		return _simpleAddPreScore(db, core, contest, inMessage, qq)
+		return _simpleAddPreScore(db, core, contest, inMessage, qq), ""
 	}
 
-	return "没有开启比赛或找不到该比赛"
+	return "没有开启比赛或找不到该比赛", ""
 }
 
 func _simpleAddPreScore(db *gorm.DB, core coreModel.Core, contest model.Contest, inMessage string, qq string) (outMessage string) {

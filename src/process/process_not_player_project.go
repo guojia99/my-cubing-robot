@@ -11,14 +11,14 @@ import (
 
 const NotPlayerProject = "未参与"
 
-func GetNotPlayerProject(db *gorm.DB, core coreModel.Core, inMessage string, qq string) (outMessage string) {
+func GetNotPlayerProject(db *gorm.DB, core coreModel.Core, inMessage string, qq string) (outMessage string, outImage string) {
 	if !strings.HasPrefix(inMessage, NotPlayerProject) {
-		return ""
+		return
 	}
 
 	var playerUser model.PlayerUser
 	if err := db.Where("qq = ?", qq).First(&playerUser).Error; err != nil {
-		return fmt.Sprintf("`%s` 未登记，请联系浩浩登记", qq)
+		return fmt.Sprintf("`%s` 未登记，请联系浩浩登记", qq), ""
 	}
 
 	var player model.Player
@@ -26,11 +26,11 @@ func GetNotPlayerProject(db *gorm.DB, core coreModel.Core, inMessage string, qq 
 
 	var contest model.Contest
 	if err := db.Where("is_end = ?", false).Where("name like ?", fmt.Sprintf("%%%s%%", "群赛")).First(&contest).Error; err != nil {
-		return "没有开启最新的群赛，请联系浩浩开启"
+		return "没有开启最新的群赛，请联系浩浩开启", ""
 	}
 	contestDetail, err := core.GetContest(contest.ID)
 	if err != nil {
-		return "没有开启最新的群赛，请联系浩浩开启"
+		return "没有开启最新的群赛，请联系浩浩开启", ""
 	}
 
 	playerContest, _ := core.GetScoreByPlayerContest(playerUser.PlayerID, contest.ID)
@@ -64,8 +64,8 @@ func GetNotPlayerProject(db *gorm.DB, core coreModel.Core, inMessage string, qq 
 		}
 	}
 	if out == "" {
-		return fmt.Sprintf("%s 已参与所有项目", player.Name)
+		return fmt.Sprintf("%s 已参与所有项目", player.Name), ""
 	}
 
-	return fmt.Sprintf("%s 未参与项目如下： %s", player.Name, out)
+	return fmt.Sprintf("%s 未参与项目如下： %s", player.Name, out), ""
 }

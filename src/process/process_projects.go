@@ -11,11 +11,11 @@ import (
 
 const ProjectsKey = "项目列表"
 
-func Projects(db *gorm.DB, core coreModel.Core, inMessage string, qq string) (outMessage string) {
+func Projects(db *gorm.DB, core coreModel.Core, inMessage string, qq string) (outMessage string, outImage string) {
 	//	http://www.mycube.club/projects
 
 	if !strings.HasPrefix(inMessage, ProjectsKey) {
-		return ""
+		return
 	}
 
 	var out = "项目列表\n"
@@ -27,5 +27,5 @@ func Projects(db *gorm.DB, core coreModel.Core, inMessage string, qq string) (ou
 	}
 	out += "\n..."
 	out += "详细请查询http://www.mycube.club/projects"
-	return out
+	return out, ""
 }
