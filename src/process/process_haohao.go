@@ -1,8 +1,7 @@
 package process
 
 import (
-	"bytes"
-	"encoding/base64"
+	"fmt"
 	"math/rand"
 	"strings"
 	"time"
@@ -33,20 +32,16 @@ func autoImage() string {
 		}
 	}
 
-	imageBytes := bytes.NewBuffer([]byte{})
-	err := dc.EncodePNG(imageBytes)
-	if err != nil {
+	out := fmt.Sprintf("/tmp/%d.png", time.Now().UnixNano())
+	if err := dc.SavePNG(out); err != nil {
 		return ""
 	}
-
-	// 将字节数组转换为Base64字符串
-	base64Str := base64.StdEncoding.EncodeToString(imageBytes.Bytes())
-	return base64Str
+	return out
 }
 
 func NvHaoHao(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessage string, outImage string) {
 	if !strings.HasPrefix(inMessage, NvHaoHaoKey) {
 		return
 	}
-	return "女装浩赶紧女装", autoImage()
+	return "女装浩赶紧女装", ""
 }

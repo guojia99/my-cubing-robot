@@ -110,7 +110,7 @@ func (c *Client) listenOutPutMessage() {
 		case data := <-c.outCh:
 			err := c.sendMessage(data.GroupId, data.QQId, data.Message, data.Image)
 			if err == nil {
-				time.Sleep(time.Second * 2)
+				time.Sleep(time.Second * 5)
 				break
 			}
 		}
@@ -124,13 +124,13 @@ func init() {
 
 // 截至目前本周赛果如下:http://www.mycube.club/contest?id=34&amp;score_cubes=score_pyram&amp;contest_tab=tab_nav_all_score_table[CQ:image,file=529e67c79b3679fbcb1b39ac21cb06e3.image,subType=0,url=https://gchat.qpic.cn/gchatpic_new/415230487/532463339-3056437820-529E67C79B3679FBCB1B39AC21CB06E3/0?term=2&amp;is_origin=0] (-1805831072)
 
-func (c *Client) sendMessage(groupId int, qqId int, message string, imageBase string) error {
+func (c *Client) sendMessage(groupId int, qqId int, message string, imagePath string) error {
 	if message[len(message)-1] == '\n' {
 		message = message[:len(message)-1]
 	}
 
 	if qqId != 0 {
-		message = fmt.Sprintf("[CQ:at,qq=%d]", qqId) + message
+		message = fmt.Sprintf("[CQ:at,qq=%d]\n", qqId) + message
 	}
 
 	if c.cfg.NotMessage {
@@ -138,8 +138,8 @@ func (c *Client) sendMessage(groupId int, qqId int, message string, imageBase st
 		return nil
 	}
 
-	if imageBase != "" {
-		message += fmt.Sprintf("[CQ:image,subType=0,type=show,file=base64://%s]", imageBase)
+	if imagePath != "" {
+		message += fmt.Sprintf("\n[CQ:image,subType=0,type=show,file=%s]", imagePath)
 	}
 
 	_, err := utils.HTTPRequest(
