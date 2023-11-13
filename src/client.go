@@ -139,7 +139,7 @@ func (c *Client) sendMessage(groupId int, qqId int, message string, imagePath st
 	}
 
 	if imagePath != "" {
-		message += fmt.Sprintf("\n[CQ:image,subType=0,type=show,file=%s]", imagePath)
+		message += fmt.Sprintf("\n[CQ:image,file=file:///%s]", imagePath)
 	}
 
 	_, err := utils.HTTPRequest(
