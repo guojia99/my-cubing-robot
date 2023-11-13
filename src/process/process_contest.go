@@ -47,7 +47,7 @@ func Contest(db *gorm.DB, core core.Core, inMessage string, qq string) (outMessa
 		}
 	}
 
-	var contestFile = path.Join("/tmp", "/contest", fmt.Sprintf("%d_contest.png", contest.ID))
+	var contestFile = path.Join("/tmp", fmt.Sprintf("contest_%d_tab_nav_all_score_table.png", contest.ID))
 	var url = fmt.Sprintf("https://mycube.club/contest?id=%d&contest_tab=tab_nav_all_score_table", contest.ID)
 
 	outMessage = fmt.Sprintf("比赛: %s\n详情请查看 %s\n", contest.Name, url)
