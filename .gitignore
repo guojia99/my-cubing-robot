@@ -56,3 +56,6 @@ python_tool/chrome-linux64
 python_tool/chromedriver-linux64
 python_tool/*.png
 python_tool/*.jpeg
+
+
+./etc/config_local.yml
