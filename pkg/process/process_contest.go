@@ -78,11 +78,11 @@ func (c *Contest) sendContest(ctx context.Context, db *gorm.DB, core core.Core, 
 	}
 
 	// todo 上传到cos
-	_ = os.MkdirAll("/tmp/x-file/robot_image", 0755)
+	_ = os.MkdirAll("/data/x-file/robot_image", 0755)
 	imagePath := fmt.Sprintf("contest_%d_tab_nav_all_score_table.png", contest.ID)
 	imageUrl := fmt.Sprintf("https://mycube.club/x-file/robot_image/%s", imagePath)
 
-	var contestFile = path.Join("/tmp/x-file/robot_image", imagePath)
+	var contestFile = path.Join("/data/x-file/robot_image", imagePath)
 	var url = fmt.Sprintf("https://mycube.club/contest?id=%d&contest_tab=tab_nav_all_score_table", contest.ID)
 	//var url = ""
 	out.AddSprintf("比赛: %s\n详情请查看 %s\n", contest.Name, url)
