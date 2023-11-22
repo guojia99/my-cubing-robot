@@ -42,7 +42,6 @@ func (P PK) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage InMes
 	msg = ReplaceAll(msg, "vs", "VS", "Vs", "vS")
 
 	_, cl, players := CutMsgWithFields(msg, "vs")
-	fmt.Println(cl, players)
 	if len(players) != 2 {
 		return EventHandler(out.AddSprintf("格式错误"))
 	}
@@ -67,6 +66,8 @@ func (P PK) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage InMes
 	if err1 != nil || err2 != nil {
 		return EventHandler(out.AddError(err2))
 	}
+
+	out.AddSprintf("%s VS %s\n", player1.Name, player2.Name)
 
 	p1Best, p1Avg := core.GetPlayerBestScore(player1.ID)
 	p2Best, p2Avg := core.GetPlayerBestScore(player2.ID)
