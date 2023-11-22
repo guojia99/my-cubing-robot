@@ -18,8 +18,7 @@ type Record struct {
 func (r Record) Prefix() []string { return []string{recordKey, recordKey2} }
 
 func (r Record) ShortHelp() string {
-
-	return ""
+	return "获取赛季记录"
 }
 
 func (r Record) Help() string {

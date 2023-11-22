@@ -2,6 +2,7 @@ package process
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"slices"
 
@@ -104,6 +105,10 @@ func (c *Player) ShortHelp() string {
 func (c *Player) Help() string { return c.ShortHelp() }
 
 func getPlayer(db *gorm.DB, in string) (model.Player, error) {
+	if len(in) == 0 {
+		return model.Player{}, errors.New("无法查询空的选手")
+	}
+
 	var player model.Player
 
 	number := utils.GetNumbers(in)

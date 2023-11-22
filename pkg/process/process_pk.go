@@ -160,8 +160,3 @@ func (P PK) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage InMes
 
 	return EventHandler(out)
 }
-
-func (P PK) withProjectPK(p1, p2 model.Player, pjs []model.Project) string {
-	var out string
-	return out
-}
