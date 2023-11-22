@@ -18,7 +18,7 @@ var List = []Process{
 	&MRank{},        // 月排名
 	//&NotPlay{}, // 未参与
 	&PreEnter{}, // 预录入
-	//&PK{},           // 成绩对比
+	&PK{},       // 成绩对比
 	//&Sor{},          // 排名分
 	//&SorX{},         // 排位分
 	//&Record{},       // 记录

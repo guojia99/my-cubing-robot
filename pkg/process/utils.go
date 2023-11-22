@@ -52,3 +52,32 @@ func ReplaceAll(s, new string, old ...string) string {
 	}
 	return s
 }
+
+// CutMsgWithFields
+// 切割格式： ${header}[${title}] ${values...}
+func CutMsgWithFields(input string, cut string) (header string, title string, values []string) {
+
+	// 这里是为了强制让]后面有空格
+	input = strings.ReplaceAll(input, "]", "] ")
+
+	// ${header}[${title}]
+	// ${values...}
+	parts := strings.Fields(input)
+
+	if len(parts) >= 1 {
+		headers := strings.SplitN(parts[0], "[", -1)
+		if len(headers) >= 1 {
+			header = headers[0]
+		}
+		if len(headers) >= 2 {
+			title = headers[1][:len(headers[1])-1]
+		}
+	}
+
+	if len(parts) >= 2 {
+		otherValue := strings.Join(parts[1:], " ")
+		values = strings.Split(otherValue, cut)
+	}
+
+	return header, title, values
+}

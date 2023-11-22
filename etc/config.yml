@@ -1,14 +1,8 @@
 dsn: "root:my123456@tcp(127.0.0.1:3306)/mycube2?charset=utf8&parseTime=True&loc=Local"
+
 QQBot:
-  - group: true # 开启群模式
-    groupList: [ # 开启
-      "xxxx", "xxxx",
-    ]
+  - group: true
     enable: true
-    appID: xxx
-    token: xxx
-  - group: false
-    enable: true
-    appID: xxx
-    token: xxx
-    groupList: [] # 为空不处理
+    appID: 101986244
+    token: 1sou4Anz0TyJ7kGLa1k2fKAl57B3tBxH
+    groupList: ["F98A8BE874C743A626695F4124E42BBE"] # 测试群

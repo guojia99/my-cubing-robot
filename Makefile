@@ -8,4 +8,4 @@ buildx:
 
 
 local:
-	go run -v main.go robot --config etc/config_local.yml
+	go run -v main.go robot --config /usr/local/etc/mycubing/robot.yml

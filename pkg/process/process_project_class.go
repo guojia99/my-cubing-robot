@@ -81,3 +81,13 @@ var projectClass = []model.ProjectClass{
 	model.ProjectClassDigit,
 	model.ProjectClassSuperHigh,
 }
+
+func getClassProjects(class model.ProjectClass) []model.Project {
+	var out []model.Project
+	for _, pj := range model.AllProjectItem() {
+		if slices.Contains(pj.Class, string(class)) {
+			out = append(out, pj.Project)
+		}
+	}
+	return out
+}
