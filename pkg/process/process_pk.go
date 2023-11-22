@@ -30,7 +30,7 @@ func (P PK) ShortHelp() string {
 func (P PK) Help() string {
 	return `PK
 1. PK: PK {选手1: ID/名称} vs {选手2：ID/名称}
-2. PK单类型PK: PK-{细项} {选手1: ID/名称} vs {选手2：ID/名称}
+2. PK单类型PK: PK[细项] {选手1: ID/名称} vs {选手2：ID/名称}
 3. 指定项目PK: 指定项目PK， PK[项目] {选手1: ID/名称} vs {选手2：ID/名称}`
 }
 
@@ -47,20 +47,15 @@ func (P PK) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage InMes
 		return EventHandler(out.AddSprintf("格式错误"))
 	}
 
-	var classValue = projectClass
+	var classValueOrPj []string
+	for _, val := range projectClass {
+		classValueOrPj = append(classValueOrPj, string(val))
+	}
 	if len(cl) != 0 {
-		classValue = make([]model.ProjectClass, 0)
-		for _, val := range strings.Split(cl, ",") {
-			for _, class := range projectClass {
-				if string(class) == val {
-					classValue = append(classValue, class)
-					break
-				}
-			}
-		}
+		classValueOrPj = strings.Split(cl, ",")
 	}
 
-	if len(classValue) == 0 {
+	if len(classValueOrPj) == 0 {
 		return EventHandler(out.AddSprintf("项目细项不能为空"))
 	}
 
@@ -77,11 +72,15 @@ func (P PK) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage InMes
 	p2Best, p2Avg := core.GetPlayerBestScore(player2.ID)
 	p1Count, p2Count := 0, 0
 
-	for _, class := range classValue {
+	for _, class := range classValueOrPj {
+		var pjs = getClassProjects(model.ProjectClass(class))
+		if len(pjs) == 0 {
+			pjs = append(pjs, model.Project(class))
+		}
 
 		setMsg := ""
 		p1C, p2C := 0, 0
-		for _, pj := range getClassProjects(class) {
+		for _, pj := range pjs {
 			p1B, p1Bok1 := p1Best[pj]
 			p2B, p2Bok1 := p2Best[pj]
 			p1A, p1Aok2 := p1Avg[pj]
@@ -113,7 +112,7 @@ func (P PK) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage InMes
 			if !p1Aok2 && !p2Aok2 {
 				continue
 			}
-			setMsg += utils.TB("", 10)
+			setMsg += utils.TB("", 8)
 			if p1Aok2 && !p2Aok2 {
 				setMsg += fmt.Sprintf("%s || %s", star+utils.TB(utils.TimeParser(p1A.Score, true), 5), utils.TB("-", 5))
 				p1C += 1
