@@ -3,7 +3,6 @@ package qq_bot
 import (
 	"context"
 	"log"
-	"os"
 	"slices"
 
 	"k8s.io/klog"
@@ -45,32 +44,14 @@ func (q *QQBotClient) doProcessLoop() {
 func (q *QQBotClient) sendMsgFn() process.SendEventHandler {
 	return func(message *process.OutMessage) (err error) {
 		if q.conf.Group {
+
 			_, err = q.api.PostGroupMessage(
 				context.TODO(), message.GroupID, &GroupMessageToCreate{
 					Content: message.OutContent,
 					MsgID:   message.MessageID,
+					Image:   message.Image,
 				},
 			)
-			if err != nil {
-				klog.Error(err)
-			}
-
-			if message.Image != "" {
-				klog.Infof("image %s", message.Image)
-				data, err2 := os.ReadFile(message.Image)
-				if err2 != nil {
-					return err2
-				}
-				_, err = q.api.PostGroupRichMediaMessage(
-					context.TODO(), message.GroupID, &GroupRichMediaMessageToCreate{
-						FileType:   1,
-						Url:        "",
-						SrvSendMsg: false,
-						FileData:   data,
-					},
-				)
-			}
-
 		} else {
 			_, err = q.api.PostMessage(
 				context.TODO(), message.ChannelID, &MessageToCreate{

@@ -78,14 +78,18 @@ func (c *Contest) sendContest(ctx context.Context, db *gorm.DB, core core.Core, 
 	}
 
 	// todo 上传到cos
-	var contestFile = path.Join("/tmp", fmt.Sprintf("contest_%d_tab_nav_all_score_table.png", contest.ID))
+	_ = os.MkdirAll("/tmp/x-file/robot_image", 0755)
+	imagePath := fmt.Sprintf("contest_%d_tab_nav_all_score_table.png", contest.ID)
+	imageUrl := fmt.Sprintf("https://mycube.club/x-file/robot_image/%s", imagePath)
+
+	var contestFile = path.Join("/tmp/x-file/robot_image", imagePath)
 	var url = fmt.Sprintf("https://mycube.club/contest?id=%d&contest_tab=tab_nav_all_score_table", contest.ID)
 	//var url = ""
 	out.AddSprintf("比赛: %s\n详情请查看 %s\n", contest.Name, url)
 
 	status, err := os.Stat(contestFile)
 	if err == nil && time.Since(status.ModTime()) < time.Minute*30 {
-		return EventHandler(out.AddSprintf("【缓存图片】\n").AddImage(contestFile))
+		return EventHandler(out.AddSprintf("【缓存图片】\n").AddImage(imageUrl))
 	}
 
 	if err = exec.Command("python3", "/usr/local/bin/load_mycube_image.py", "--image", contestFile, "--url", url).Run(); err != nil {
@@ -93,7 +97,7 @@ func (c *Contest) sendContest(ctx context.Context, db *gorm.DB, core core.Core, 
 		out.AddSprintf("【图像生成失败】")
 		return EventHandler(out)
 	}
-	return EventHandler(out.AddImage(contestFile))
+	return EventHandler(out.AddImage(imageUrl))
 }
 
 func (c *Contest) sendList(ctx context.Context, db *gorm.DB, core core.Core, inMessage InMessage, EventHandler SendEventHandler) error {
