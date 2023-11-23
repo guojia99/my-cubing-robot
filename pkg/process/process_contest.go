@@ -58,6 +58,7 @@ func (c *Contest) getContest(ctx context.Context, db *gorm.DB, core core.Core, m
 	if contestId != 0 {
 		return contest, db.Where("id = ?", contestId).First(&contest).Error
 	}
+
 	msg = ReplaceAll(msg, "", c.Prefix()...)
 	if len(msg) > 0 {
 		err := db.Model(&model.Contest{}).Where("name like ?", fmt.Sprintf("%%%s%%", msg)).First(&contest).Error
@@ -72,7 +73,9 @@ func (c *Contest) getContest(ctx context.Context, db *gorm.DB, core core.Core, m
 
 func (c *Contest) sendContest(ctx context.Context, db *gorm.DB, core core.Core, inMessage InMessage, EventHandler SendEventHandler) error {
 	out := inMessage.CopyOut()
-	contest, err := c.getContest(ctx, db, core, inMessage.Content)
+	msg := ReplaceAll(inMessage.Content, "", contestKey1, contestKey2, "-", " ")
+
+	contest, err := c.getContest(ctx, db, core, msg)
 	if err != nil {
 		return EventHandler(out.AddError("找不到比赛"))
 	}

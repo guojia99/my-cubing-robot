@@ -67,33 +67,20 @@ func (q *QQBotClient) getImageInfo(group, image string) (string, error) {
 }
 
 func (q *QQBotClient) groupMsg(message *process.OutMessage) (err error) {
+	msg := &GroupMessageToCreate{
+		Content: message.OutContent,
+		MsgID:   message.MessageID,
+	}
+
 	// 发送富媒体
 	if message.Image != "" {
-		var fileInfo string
-		fileInfo, err = q.getImageInfo(message.GroupID, message.Image)
+		msg.MsgType = 7
+		msg.Media.FileInfo, err = q.getImageInfo(message.GroupID, message.Image)
 		if err != nil {
 			return err
 		}
-		_, err = q.api.PostGroupMessage(
-			q.ctx, message.GroupID, &GroupMessageToCreate{
-				MsgType: 7,
-				Content: message.OutContent,
-				MsgID:   message.MessageID,
-				Media: Media{
-					FileInfo: fileInfo,
-				},
-			},
-		)
-		return
 	}
-
-	_, err = q.api.PostGroupMessage(
-		q.ctx, message.GroupID, &GroupMessageToCreate{
-			MsgType: 1,
-			Content: message.OutContent,
-			MsgID:   message.MessageID,
-		},
-	)
+	_, err = q.api.PostGroupMessage(q.ctx, message.GroupID, msg)
 	return err
 }
 
