@@ -104,6 +104,14 @@ func (q *QQBotClient) sendMsg(message *process.OutMessage) error {
 
 func (q *QQBotClient) sendMsgFn() process.SendEventHandler {
 	return func(message *process.OutMessage) (err error) {
+		defer func() {
+			if result := recover(); result != nil {
+				klog.Error(result)
+			}
+			if err != nil {
+				klog.Error(err)
+			}
+		}()
 		klog.Infof("send Msg `%s` | `%s`", message.OutContent, message.Image)
 		if q.conf.Group {
 			return q.groupMsg(message)
