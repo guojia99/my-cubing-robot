@@ -68,7 +68,7 @@ type MessageAPI interface {
 	Messages(ctx context.Context, channelID string, pager *dto.MessagesPager) ([]*dto.Message, error)
 	PostMessage(ctx context.Context, channelID string, msg *dto.MessageToCreate) (*dto.Message, error)
 	PostGroupMessage(ctx context.Context, groupId string, msg *dto.GroupMessageToCreate) (*dto.Message, error)
-	PostGroupRichMediaMessage(ctx context.Context, groupId string, msg *dto.GroupRichMediaMessageToCreate) (*dto.Message, error)
+	PostGroupRichMediaMessage(ctx context.Context, groupId string, msg *dto.GroupRichMediaMessageToCreate) (*dto.RichMediaMessage, error)
 	PatchMessage(
 		ctx context.Context,
 		channelID string, messageID string, msg *dto.MessageToCreate,

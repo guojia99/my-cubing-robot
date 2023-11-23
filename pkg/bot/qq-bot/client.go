@@ -6,6 +6,7 @@ import (
 	"time"
 
 	core "github.com/guojia99/my-cubing-core"
+	"github.com/patrickmn/go-cache"
 	"gorm.io/gorm"
 
 	"github.com/guojia99/my_cubing_robot/pkg/process"
@@ -13,11 +14,12 @@ import (
 
 func NewQQBotClient(conf Configs, db *gorm.DB) *QQBotClient {
 	return &QQBotClient{
-		db:       db,
-		core:     core.NewCore(db, false, time.Second),
-		conf:     conf,
-		inputCh:  make(chan process.InMessage, 255),
-		outputCh: make(chan MessageToCreate, 255),
+		db:         db,
+		core:       core.NewCore(db, false, time.Second),
+		conf:       conf,
+		inputCh:    make(chan process.InMessage, 255),
+		outputCh:   make(chan MessageToCreate, 255),
+		imageCache: cache.New(time.Minute*5, time.Minute*5),
 	}
 }
 
@@ -32,6 +34,8 @@ type QQBotClient struct {
 	inputCh  chan process.InMessage
 	outputCh chan MessageToCreate
 	process  []process.Process
+
+	imageCache *cache.Cache
 }
 
 func (q *QQBotClient) RegisterProcess(process ...process.Process) {

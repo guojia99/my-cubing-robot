@@ -10,6 +10,7 @@ type MessageToCreate struct {
 	Embed   *Embed `json:"embed,omitempty"`
 	Ark     *Ark   `json:"ark,omitempty"`
 	Image   string `json:"image,omitempty"`
+	Media   Media  `json:"media,omitempty"` // 媒体
 	// 要回复的消息id，为空是主动消息，公域机器人会异步审核，不为空是被动消息，公域机器人会校验语料
 	MsgID            string                    `json:"msg_id,omitempty"`
 	MessageReference *MessageReference         `json:"message_reference,omitempty"`
@@ -18,12 +19,13 @@ type MessageToCreate struct {
 	EventID          string                    `json:"event_id,omitempty"` // 要回复的事件id, 逻辑同MsgID
 }
 
-// 消息类型： 0 是文本，1 图文混排，2  markdown， 3 ark，4 embed
+// 消息类型： 0 是文本，1 图文混排，2  markdown， 3 ark，4 embed, 7 富媒体
 type GroupMessageToCreate struct {
 	Content          string                    `json:"content,omitempty"`
 	MsgType          int                       `json:"msg_type"`
 	Markdown         *Markdown                 `json:"markdown,omitempty"`
 	Keyboard         *keyboard.MessageKeyboard `json:"keyboard,omitempty"` // 消息按钮组件
+	Media            Media                     `json:"media,omitempty"`    // 媒体
 	Ark              *Ark                      `json:"ark,omitempty"`
 	Image            string                    `json:"image,omitempty"`
 	MessageReference *MessageReference         `json:"message_reference,omitempty"`
@@ -39,6 +41,12 @@ type GroupRichMediaMessageToCreate struct {
 	FileData   []byte `json:"file_data"`
 }
 
+type RichMediaMessage struct {
+	FileUuid string `json:"file_uuid"`
+	FileInfo string `json:"file_info"`
+	Ttl      int    `json:"ttl"`
+}
+
 // MessageReference 引用消息
 type MessageReference struct {
 	MessageID             string `json:"message_id"`               // 消息 id
@@ -50,6 +58,10 @@ type Markdown struct {
 	TemplateID int               `json:"template_id"` // 模版 id
 	Params     []*MarkdownParams `json:"params"`      // 模版参数
 	Content    string            `json:"content"`     // 原生 markdown
+}
+
+type Media struct {
+	FileInfo string `json:"file_info,omitempty"`
 }
 
 // MarkdownParams markdown 模版参数 键值对

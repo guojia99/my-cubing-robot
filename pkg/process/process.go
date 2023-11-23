@@ -9,6 +9,7 @@ import (
 )
 
 var List = []Process{
+	&TestFile{},
 	&Help{},         // 帮助
 	&Contest{},      // 比赛信息
 	&Project{},      // 项目列表

@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"slices"
+	"time"
 
 	"k8s.io/klog"
 
@@ -41,28 +42,72 @@ func (q *QQBotClient) doProcessLoop() {
 	}
 }
 
+func (q *QQBotClient) getImageInfo(group, image string) (string, error) {
+
+	value, ok := q.imageCache.Get(group + image)
+	if ok {
+		return value.(string), nil
+	}
+
+	out, err := q.api.PostGroupRichMediaMessage(
+		q.ctx, group, &GroupRichMediaMessageToCreate{
+			FileType:   1,
+			Url:        image,
+			SrvSendMsg: false,
+		},
+	)
+	if err != nil {
+		return "", err
+	}
+
+	q.imageCache.Set(out.FileInfo, group+image, time.Minute*2)
+
+	klog.Infof("with file info %s, uuid %s", out.FileInfo, out.FileUuid)
+	return out.FileInfo, nil
+}
+
+func (q *QQBotClient) groupMsg(message *process.OutMessage) (err error) {
+	msgType := 1
+	fileInfo := ""
+	// 发送富媒体
+	if message.Image != "" {
+		fileInfo, err = q.getImageInfo(message.GroupID, message.Image)
+		if err == nil {
+			msgType = 7
+		}
+	}
+
+	// 获取
+	_, err = q.api.PostGroupMessage(
+		q.ctx, message.GroupID, &GroupMessageToCreate{
+			MsgType: msgType,
+			Content: message.OutContent,
+			MsgID:   message.MessageID,
+			Media: Media{
+				FileInfo: fileInfo,
+			},
+		},
+	)
+	return err
+}
+
+func (q *QQBotClient) sendMsg(message *process.OutMessage) error {
+	_, err := q.api.PostMessage(
+		context.TODO(), message.ChannelID, &MessageToCreate{
+			Content: message.OutContent,
+			MsgID:   message.MessageID,
+			Image:   message.Image,
+		},
+	)
+	return err
+}
+
 func (q *QQBotClient) sendMsgFn() process.SendEventHandler {
 	return func(message *process.OutMessage) (err error) {
+		klog.Infof("send Msg `%s` | `%s`", message.OutContent, message.Image)
 		if q.conf.Group {
-
-			_, err = q.api.PostGroupMessage(
-				context.TODO(), message.GroupID, &GroupMessageToCreate{
-					Content: message.OutContent,
-					MsgID:   message.MessageID,
-					Image:   message.Image,
-				},
-			)
-		} else {
-			_, err = q.api.PostMessage(
-				context.TODO(), message.ChannelID, &MessageToCreate{
-					Content: message.OutContent,
-					MsgID:   message.MessageID,
-					Image:   message.Image,
-				},
-			)
+			return q.groupMsg(message)
 		}
-
-		klog.Infof("send Msg `%s`", message.OutContent)
-		return err
+		return q.sendMsg(message)
 	}
 }

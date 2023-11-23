@@ -16,6 +16,7 @@ def main():
     parser = argparse.ArgumentParser(description="image_load")
     parser.add_argument("--image", help="path")
     parser.add_argument("--url", help="url")
+    parser.add_argument("--wait", help="wait time", default=5)
 
     args = parser.parse_args()
     if args.image and args.url:
@@ -30,7 +31,7 @@ def main():
         driver.get(args.url)
         driver.maximize_window()
 
-        time.sleep(5)
+        time.sleep(args.wait)
         driver.fullscreen_window()
 
         height = driver.execute_script("return document.documentElement.scrollHeight")

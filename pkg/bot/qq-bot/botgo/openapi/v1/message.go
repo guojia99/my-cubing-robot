@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	jsoniter "github.com/json-iterator/go"
 	"github.com/tidwall/gjson"
 
 	"github.com/guojia99/my_cubing_robot/pkg/bot/qq-bot/botgo/dto"
@@ -82,7 +83,7 @@ func (o *openAPI) PostGroupMessage(ctx context.Context, groupID string, msg *dto
 	return resp.Result().(*dto.Message), nil
 }
 
-func (o *openAPI) PostGroupRichMediaMessage(ctx context.Context, groupID string, msg *dto.GroupRichMediaMessageToCreate) (*dto.Message, error) {
+func (o *openAPI) PostGroupRichMediaMessage(ctx context.Context, groupID string, msg *dto.GroupRichMediaMessageToCreate) (*dto.RichMediaMessage, error) {
 	resp, err := o.request(ctx).
 		SetResult(dto.Message{}).
 		SetPathParam("group_openid", groupID).
@@ -91,8 +92,9 @@ func (o *openAPI) PostGroupRichMediaMessage(ctx context.Context, groupID string,
 	if err != nil {
 		return nil, err
 	}
-
-	return resp.Result().(*dto.Message), nil
+	var out *dto.RichMediaMessage
+	err = jsoniter.Unmarshal(resp.Body(), &out)
+	return out, err
 }
 
 // PatchMessage 编辑消息

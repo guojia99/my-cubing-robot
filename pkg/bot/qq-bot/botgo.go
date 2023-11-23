@@ -19,6 +19,7 @@ type GroupMessageEventHandler = event.GroupMessageEventHandler
 type ATMessageEventHandler = event.ATMessageEventHandler
 type MessageEventHandler = event.MessageEventHandler
 type WSPayload = dto.WSPayload
+type Media = dto.Media
 type WSMessageData = dto.WSMessageData
 type WSATMessageData = dto.WSATMessageData
 type WSGroupMessageData = dto.WSGroupMessageData
