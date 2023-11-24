@@ -23,7 +23,7 @@ var List = []Process{
 	//&Sor{},          // 排名分
 	//&SorX{},         // 排位分
 	&Record{}, // 记录
-	//&Export{},       // 导出
+	&Export{}, // 导出
 }
 
 const MaxKeyLength = 8

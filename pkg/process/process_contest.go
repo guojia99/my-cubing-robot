@@ -17,6 +17,10 @@ import (
 	"github.com/guojia99/my_cubing_robot/pkg/utils"
 )
 
+func init() {
+	_ = os.MkdirAll("/data/x-file/robot_image", 0755)
+}
+
 const (
 	contestKey1 = "比赛"
 	contestKey2 = "contest"
@@ -81,7 +85,6 @@ func (c *Contest) sendContest(ctx context.Context, db *gorm.DB, core core.Core, 
 	}
 
 	// todo 上传到cos
-	_ = os.MkdirAll("/data/x-file/robot_image", 0755)
 	imagePath := fmt.Sprintf("contest_%d_tab_nav_all_score_table.png", contest.ID)
 	imageUrl := fmt.Sprintf("https://mycube.club/x-file/robot_image/%s", imagePath)
 

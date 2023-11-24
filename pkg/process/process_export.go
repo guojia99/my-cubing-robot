@@ -2,11 +2,21 @@ package process
 
 import (
 	"context"
+	"fmt"
+	"os"
+	"path"
 	"sync"
 
 	core "github.com/guojia99/my-cubing-core"
+	exports "github.com/guojia99/my-cubing-core/export"
 	"gorm.io/gorm"
+
+	"github.com/guojia99/my_cubing_robot/pkg/utils"
 )
+
+func init() {
+	_ = os.MkdirAll("/data/x-file/robot_image", 0755)
+}
 
 type Export struct {
 	sync.Mutex
@@ -25,10 +35,9 @@ func (e *Export) ShortHelp() string {
 
 func (e *Export) Help() string {
 	return `导出功能:
-1. 导出-{比赛ID}: 导出该场比赛的表格数据, 没有ID代表所有.
-2. 导出选手-{选手ID}: 导出选手成绩, 没有ID代表所有选手的数据.
-3. 导出记录： 导出记录历史和当前的记录
-`
+1. 导出-{比赛ID}: 导出该场比赛的表格数据`
+	//2. 导出选手-{选手ID}: 导出选手成绩, 没有ID代表所有选手的数据.
+	//3. 导出记录： 导出记录历史和当前的记录`
 }
 
 func (e *Export) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage InMessage, EventHandler SendEventHandler) error {
@@ -38,5 +47,23 @@ func (e *Export) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage 
 	}
 	defer e.Unlock()
 
-	return nil
+	msg := ReplaceAll(inMessage.Content, "", exportKey, exportKey2, "-")
+	if len(msg) == 0 {
+		return nil
+	}
+
+	numbers := utils.GetNumbers(msg)
+	if len(numbers) == 0 {
+		return EventHandler(out.AddSprintf("无法导出 `%s`", msg))
+	}
+	id := int(numbers[0])
+
+	file := path.Join("/data/x-file/robot_image", fmt.Sprintf("contest_%d_value.xlsx", id))
+	imageUrl := fmt.Sprintf("https://mycube.club/x-file/robot_image/contest_%d_value.xlsx", id)
+	if err := exports.ExportContestScoreXlsx(core, uint(id), file); err != nil {
+		return EventHandler(out.AddError(err))
+	}
+
+	out.AddSprintf("导出成功: %s", imageUrl)
+	return EventHandler(out)
 }
