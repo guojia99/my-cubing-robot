@@ -16,7 +16,7 @@ import (
 
 const (
 	mRankKey  = "月排名"
-	mRankKey2 = "m-rank"
+	mRankKey2 = "m_rank"
 )
 
 type MRank struct {

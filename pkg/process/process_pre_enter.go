@@ -29,6 +29,8 @@ func (c *PreEnter) ShortHelp() string {
 }
 func (c *PreEnter) Help() string {
 	return `录入
+* 你可以使用 [登记] 功能进行登记你的qq帐号
+
 0. 如存在注册信息异常无法录入的情况下, 请使用第四个方式进行录入.
 1. 快速录入:  录入 {项目} {成绩...}
 2. 多项目:  录入 {项目} {成绩...} / {项目2} {成绩2}
@@ -46,8 +48,8 @@ func (c *PreEnter) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessag
 	msg = strings.ReplaceAll(msg, "，", ",")
 	msg = strings.ReplaceAll(msg, "\\", "/")
 	msg = strings.ReplaceAll(msg, "。", ".")
-	msg = strings.ReplaceAll(msg, "【", "[")
-	msg = strings.ReplaceAll(msg, "】", "]")
+	msg = ReplaceAll(msg, "[", "【", "〔", "〈", "［")
+	msg = ReplaceAll(msg, "]", "】", "〕", "〉", "］")
 
 	// 获取是否存在比赛
 	var (
@@ -69,7 +71,7 @@ func (c *PreEnter) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessag
 		}
 		msg = split[1]
 	} else {
-		if err = db.Where("qq = ?", inMessage.UserID).First(&playerUser).Error; err != nil {
+		if err = db.Where("qq = ?", inMessage.UserID).Or("qq_bot_uni_id = ?", inMessage.UserID).First(&playerUser).Error; err != nil {
 			return EventHandler(out.AddSprintf("`%s` 未登记，请联系浩浩登记", inMessage.UserID))
 		}
 		var _ = db.Where("id = ?", playerUser.PlayerID).First(&player)

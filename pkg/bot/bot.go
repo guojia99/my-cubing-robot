@@ -4,6 +4,7 @@ import (
 	"context"
 	"sync"
 
+	"github.com/guojia99/my-cubing-core/model"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -59,6 +60,9 @@ func NewBots(cfgFile string) (Bot, error) {
 	var db *gorm.DB
 	db, err = gorm.Open(mysql.New(mysql.Config{DSN: cfg.DSN}), &gorm.Config{Logger: logger.Discard})
 	if err != nil {
+		return nil, err
+	}
+	if err = db.AutoMigrate(model.Models...); err != nil {
 		return nil, err
 	}
 
