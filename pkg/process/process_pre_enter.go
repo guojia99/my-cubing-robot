@@ -8,6 +8,7 @@ import (
 
 	core "github.com/guojia99/my-cubing-core"
 	"github.com/guojia99/my-cubing-core/model"
+	coreUtils "github.com/guojia99/my-cubing-core/utils"
 	"gorm.io/gorm"
 
 	"github.com/guojia99/my_cubing_robot/pkg/utils"
@@ -115,9 +116,12 @@ func _simpleAddPreScore(db *gorm.DB, core core.Core, player model.Player, contes
 
 		if err = core.AddPreScore(val); err != nil {
 			out += fmt.Sprintf("%s %s 录入失败： %s\n", player.Name, val.Project.Cn(), err)
-		} else {
-			out += fmt.Sprintf("%s %s 录入成功！\n", player.Name, val.Project.Cn())
+			continue
 		}
+
+		score := model.Score{Project: val.Project}
+		score.SetResult(val.Result, model.ScorePenalty{})
+		out += fmt.Sprintf("%s %s (%s / %s) 录入成功！\n", player.Name, val.Project.Cn(), coreUtils.BestOrAvgParser(score, false), coreUtils.BestOrAvgParser(score, true))
 	}
 	return out
 }

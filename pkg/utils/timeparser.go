@@ -11,11 +11,12 @@ import (
 )
 
 func TimeParser(score model.Score, isAvg bool) string {
-
 	if score.Project.RouteType() == model.RouteTypeRepeatedly {
-		return fmt.Sprintf("%2.0f / %2.0f %s", score.Result1, score.Result2, TimeParser(
-			model.Score{Best: score.Result3, Project: model.Cube333, Avg: score.Result3}, isAvg,
-		))
+		return fmt.Sprintf(
+			"%2.0f / %2.0f %s", score.Result1, score.Result2, TimeParser(
+				model.Score{Best: score.Result3, Project: model.Cube333, Avg: score.Result3}, isAvg,
+			),
+		)
 	}
 
 	if score.Project == model.Cube333FM {
