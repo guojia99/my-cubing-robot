@@ -46,6 +46,10 @@ func (P PK) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage InMes
 	msg = ReplaceAll(msg, "vs", "VS", "Vs", "vS")
 	msg = ReplaceAll(msg, "", " ")
 
+	if !strings.Contains(msg, "[") {
+		msg = ReplaceAll(msg, "pk[]", "PK", "pk", "pK", "Pk")
+	}
+
 	_, cl, players := CutMsgWithFields(msg, "vs")
 	if len(players) != 2 {
 		return EventHandler(out.AddSprintf("格式错误"))
