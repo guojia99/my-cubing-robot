@@ -22,6 +22,10 @@ const (
 type MRank struct {
 }
 
+func (M MRank) CheckPrefix(in string) bool {
+	return false
+}
+
 func (M MRank) Prefix() []string { return []string{mRankKey, mRankKey2} }
 
 func (M MRank) ShortHelp() string {

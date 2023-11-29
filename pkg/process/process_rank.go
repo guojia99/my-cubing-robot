@@ -20,6 +20,10 @@ const (
 type Rank struct {
 }
 
+func (r Rank) CheckPrefix(in string) bool {
+	return false
+}
+
 func (r Rank) Prefix() []string {
 	return []string{rankKey, rankKey2}
 }

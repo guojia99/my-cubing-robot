@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"sync"
 
 	core "github.com/guojia99/my-cubing-core"
 	"github.com/guojia99/my-cubing-core/model"
@@ -22,6 +23,34 @@ const (
 var _ Process = &PreEnter{}
 
 type PreEnter struct {
+	once sync.Once
+
+	mp map[string]Process
+}
+
+func (c *PreEnter) CheckPrefix(in string) bool {
+	c.once.Do(
+		func() {
+			c.mp = make(map[string]Process)
+			for _, pj := range model.AllProjectRoute() {
+				c.mp[pj.Cn()] = c
+				c.mp[string(pj)] = c
+			}
+		},
+	)
+
+	in = strings.TrimSpace(in)
+	key, _, err := CheckPrefix(in, c.mp)
+	if err != nil {
+		return false
+	}
+	in = strings.ReplaceAll(in, key, "")
+
+	if len(utils.GetNumbers(in)) > 0 {
+		return true
+	}
+
+	return false
 }
 
 func (c *PreEnter) Prefix() []string { return []string{preEnterKey, preEnterKey2} }
@@ -43,8 +72,7 @@ func (c *PreEnter) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessag
 	out := inMessage.CopyOut()
 
 	// 过滤无效数据
-	msg := ReplaceAll(inMessage.Content, "", append(c.Prefix(), "\n")...)
-	msg = strings.ReplaceAll(msg, "\n", "")
+	msg := ReplaceAll(inMessage.Content, "", append(c.Prefix(), "(", ")", "\n")...)
 	msg = strings.ReplaceAll(msg, "：", ":")
 	msg = strings.ReplaceAll(msg, "，", ",")
 	msg = strings.ReplaceAll(msg, "\\", "/")
@@ -108,6 +136,10 @@ func _simpleAddPreScore(db *gorm.DB, core core.Core, player model.Player, contes
 	}
 
 	var out = fmt.Sprintf("比赛：%s\n", contest.Name)
+
+	bests, avgs := core.GetAllProjectBestScores()
+	sBests, sAvgs := core.GetPlayerBestScore(player.ID)
+
 	for _, val := range preScores {
 		val.PlayerID = player.ID
 		val.ContestID = contest.ID
@@ -122,6 +154,47 @@ func _simpleAddPreScore(db *gorm.DB, core core.Core, player model.Player, contes
 		score := model.Score{Project: val.Project}
 		score.SetResult(val.Result, model.ScorePenalty{})
 		out += fmt.Sprintf("%s %s (%s / %s) 录入成功！\n", player.Name, val.Project.Cn(), coreUtils.BestOrAvgParser(score, false), coreUtils.BestOrAvgParser(score, true))
+
+		// 刷新记录成绩提示
+		best, bestOk := bests[val.Project]
+		avg, avgOk := avgs[val.Project]
+		if !bestOk && !avgOk && !score.DBest() && !score.DAvg() {
+			out += fmt.Sprintf("(该成绩是第一个成功有单次和平均有效成绩)\n")
+			continue
+		} else if !bestOk && !score.DBest() {
+			out += fmt.Sprintf("(该成绩是第一个成功有单次成绩)\n")
+		} else if !avgOk && !score.DAvg() {
+			out += fmt.Sprintf("(该成绩是第一个成功有平均成绩)\n")
+		}
+		if bestOk && avgOk && score.IsBestScore(best) && score.IsBestAvgScore(avg) { // 双刷提示
+			out += fmt.Sprintf("(该成绩双刷了`%s | %s` 的历史最佳成绩 (%s / %s))\n", best.PlayerName, avg.PlayerName, coreUtils.BestOrAvgParser(best, false), coreUtils.BestOrAvgParser(avg, true))
+			continue
+		} else if bestOk && score.IsBestScore(best) { // 刷了单次
+			out += fmt.Sprintf("(该成绩打破了`%s` 的历史单次最佳成绩 %s)\n", best.PlayerName, coreUtils.BestOrAvgParser(best, false))
+			continue
+		} else if avgOk && score.IsBestAvgScore(avg) { // 刷了平均
+			if val.Project.RouteType() != model.RouteType1rounds && val.Project.RouteType() != model.RouteTypeRepeatedly {
+				out += fmt.Sprintf("(该成绩打破了`%s` 的历史平均最佳成绩 %s)\n", best.PlayerName, coreUtils.BestOrAvgParser(avg, true))
+			}
+			continue
+		}
+
+		// 刷新pb
+		sBest, sBestOk := sBests[val.Project]
+		sAvg, sAvgOk := sAvgs[val.Project]
+
+		if sBestOk && sAvgOk && score.IsBestScore(sBest.Score) && score.IsBestAvgScore(sAvg.Score) { // 双刷提示
+			out += fmt.Sprintf("(该成绩双刷了自己的历史最佳成绩 (%s / %s))\n", coreUtils.BestOrAvgParser(sBest.Score, false), coreUtils.BestOrAvgParser(sAvg.Score, true))
+			continue
+		} else if sBestOk && score.IsBestScore(sBest.Score) { // 刷了单次
+			out += fmt.Sprintf("(该成绩打破了自己的历史单次最佳成绩 %s)\n", coreUtils.BestOrAvgParser(sBest.Score, false))
+			continue
+		} else if sAvgOk && score.IsBestAvgScore(sAvg.Score) { // 刷了平均
+			if val.Project.RouteType() != model.RouteType1rounds && val.Project.RouteType() != model.RouteTypeRepeatedly {
+				out += fmt.Sprintf("(该成绩打破了自己的历史平均最佳成绩 %s)\n", coreUtils.BestOrAvgParser(sAvg.Score, true))
+			}
+			continue
+		}
 	}
 	return out
 }

@@ -24,6 +24,10 @@ const (
 type Player struct {
 }
 
+func (c *Player) CheckPrefix(in string) bool {
+	return false
+}
+
 func (c *Player) Prefix() []string { return []string{playerKey, playerKey2, playerKey3} }
 
 func (c *Player) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage InMessage, EventHandler SendEventHandler) error {

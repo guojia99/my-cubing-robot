@@ -31,6 +31,10 @@ var _ Process = &Contest{}
 type Contest struct {
 }
 
+func (c *Contest) CheckPrefix(in string) bool {
+	return false
+}
+
 func (c *Contest) Prefix() []string { return []string{contestKey1, contestKey2} }
 func (c *Contest) ShortHelp() string {
 	return "获取比赛信息, 比赛-{赛事ID/名称} 可获取某场比赛详细信息, 比赛列表可获取近期比赛场次"

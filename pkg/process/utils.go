@@ -37,10 +37,24 @@ func findSubSeq(input string) []string {
 	return out
 }
 
-func CheckPrefix(msg string, processMap map[string]Process) (Process, error) {
+func CheckPrefix(msg string, processMap map[string]Process) (string, Process, error) {
 	for _, key := range findSubSeq(msg) {
 		if p, ok := processMap[key]; ok {
-			return p, nil
+			return key, p, nil
+		}
+	}
+	return "", nil, errors.New("命令未找到")
+}
+
+func CheckPrefixPro(msg string, processMap map[string]Process) (Process, error) {
+	_, p, err := CheckPrefix(msg, processMap)
+	if err == nil {
+		return p, nil
+	}
+
+	for _, mp := range processMap {
+		if mp.CheckPrefix(msg) {
+			return mp, nil
 		}
 	}
 	return nil, errors.New("命令未找到")

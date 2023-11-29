@@ -18,6 +18,10 @@ const (
 type Record struct {
 }
 
+func (r Record) CheckPrefix(in string) bool {
+	return false
+}
+
 func (r Record) Prefix() []string { return []string{recordKey, recordKey2} }
 
 func (r Record) ShortHelp() string {

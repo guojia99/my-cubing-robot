@@ -22,6 +22,10 @@ type Help struct {
 	keyMap map[string]Process
 }
 
+func (c *Help) CheckPrefix(in string) bool {
+	return false
+}
+
 func (c *Help) Prefix() []string { return []string{helpKey1, helpKey2} }
 
 func (c *Help) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage InMessage, EventHandler SendEventHandler) error {
@@ -30,7 +34,7 @@ func (c *Help) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage In
 
 	msg := ReplaceAll(inMessage.Content, "", helpKey1, helpKey2, " ", "-")
 	if len(msg) > 0 {
-		p, err := CheckPrefix(msg, c.keyMap)
+		_, p, err := CheckPrefix(msg, c.keyMap)
 		if err != nil {
 			return EventHandler(out.AddError(err))
 		}

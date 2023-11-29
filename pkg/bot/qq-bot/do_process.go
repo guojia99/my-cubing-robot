@@ -28,7 +28,7 @@ func (q *QQBotClient) doProcessLoop() {
 				ctx, cancel := context.WithCancel(q.ctx)
 				defer cancel()
 
-				prs, err := process.CheckPrefix(msg.Content, mp)
+				prs, err := process.CheckPrefixPro(msg.Content, mp)
 				if err != nil {
 					klog.Warning(msg.Content, err.Error())
 					return

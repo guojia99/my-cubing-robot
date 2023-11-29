@@ -22,6 +22,10 @@ type Export struct {
 	sync.Mutex
 }
 
+func (e *Export) CheckPrefix(in string) bool {
+	return false
+}
+
 const (
 	exportKey  = "导出"
 	exportKey2 = "export"

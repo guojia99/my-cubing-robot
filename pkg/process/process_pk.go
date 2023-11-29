@@ -21,6 +21,10 @@ const (
 type PK struct {
 }
 
+func (P PK) CheckPrefix(in string) bool {
+	return false
+}
+
 func (P PK) Prefix() []string { return []string{pkKey, pkKey2} }
 
 func (P PK) ShortHelp() string {

@@ -17,6 +17,10 @@ var _ Process = &Project{}
 type Project struct {
 }
 
+func (c *Project) CheckPrefix(in string) bool {
+	return false
+}
+
 func (c *Project) Prefix() []string { return []string{projectKey, projectKey2} }
 
 func (c *Project) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage InMessage, EventHandler SendEventHandler) error {

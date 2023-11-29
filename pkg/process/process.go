@@ -17,8 +17,8 @@ var List = []Process{
 	&Player{},       // 玩家
 	&Rank{},         // 排名
 	&MRank{},        // 月排名
-	//&NotPlay{}, // 未参与
-	&PreEnter{}, // 预录入
+	&NotPlay{},      // 未参与
+	&PreEnter{},     // 预录入
 	&RegisterUser{},
 	&PK{}, // 成绩对比
 	//&Sor{},          // 排名分
@@ -55,6 +55,7 @@ type (
 	SendEventHandler func(*OutMessage) error
 
 	Process interface {
+		CheckPrefix(in string) bool
 		Prefix() []string
 		ShortHelp() string
 		Help() string

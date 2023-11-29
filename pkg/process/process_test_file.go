@@ -11,6 +11,10 @@ import (
 type TestFile struct {
 }
 
+func (t TestFile) CheckPrefix(in string) bool {
+	return false
+}
+
 func (t TestFile) Prefix() []string { return []string{"测试"} }
 
 func (t TestFile) ShortHelp() string { return "测试用的" }

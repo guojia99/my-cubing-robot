@@ -20,6 +20,10 @@ var _ Process = &NotPlay{}
 type NotPlay struct {
 }
 
+func (c *NotPlay) CheckPrefix(in string) bool {
+	return false
+}
+
 func (c *NotPlay) Prefix() []string { return []string{notPlayKey1, notPlayKey2} }
 
 func (c *NotPlay) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage InMessage, EventHandler SendEventHandler) error {
@@ -27,7 +31,7 @@ func (c *NotPlay) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage
 
 	// get detail
 	var playerUser model.PlayerUser
-	if err := db.Where("qq = ?", inMessage.UserID).First(&playerUser).Error; err != nil {
+	if err := db.Where("qq = ?", inMessage.UserID).Or("qq_bot_uni_id = ?", inMessage.UserID).First(&playerUser).Error; err != nil {
 		return EventHandler(out.AddSprintf("`%s` 未登记，请联系浩浩登记", inMessage.UserID))
 	}
 	var player model.Player
@@ -55,6 +59,7 @@ func (c *NotPlay) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage
 			class = string(val)
 		}
 	}
+	out.AddSprintf("未参与%s项目\n", class)
 
 	for _, val := range contestDetail.Rounds {
 		ok := false

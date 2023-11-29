@@ -19,6 +19,10 @@ const (
 type ProjectClass struct {
 }
 
+func (p ProjectClass) CheckPrefix(in string) bool {
+	return false
+}
+
 func (p ProjectClass) Prefix() []string {
 	return []string{projectClassKey, projectClassKey2, projectClassKey3}
 }

@@ -22,6 +22,10 @@ var _ Process = &RegisterUser{}
 type RegisterUser struct {
 }
 
+func (r *RegisterUser) CheckPrefix(in string) bool {
+	return false
+}
+
 func (r *RegisterUser) Prefix() []string { return []string{registerUserKey} }
 
 func (r *RegisterUser) ShortHelp() string {

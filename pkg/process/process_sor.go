@@ -16,6 +16,10 @@ var _ Process = &Sor{}
 type Sor struct {
 }
 
+func (c *Sor) CheckPrefix(in string) bool {
+	return false
+}
+
 func (c *Sor) Prefix() []string { return []string{sorKey} }
 
 func (c *Sor) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage InMessage, EventHandler SendEventHandler) error {
