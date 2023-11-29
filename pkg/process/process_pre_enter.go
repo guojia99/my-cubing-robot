@@ -185,15 +185,12 @@ func _simpleAddPreScore(db *gorm.DB, core core.Core, player model.Player, contes
 
 		if sBestOk && sAvgOk && score.IsBestScore(sBest.Score) && score.IsBestAvgScore(sAvg.Score) { // 双刷提示
 			out += fmt.Sprintf("(该成绩双刷了自己的历史最佳成绩 (%s / %s))\n", coreUtils.BestOrAvgParser(sBest.Score, false), coreUtils.BestOrAvgParser(sAvg.Score, true))
-			continue
 		} else if sBestOk && score.IsBestScore(sBest.Score) { // 刷了单次
 			out += fmt.Sprintf("(该成绩打破了自己的历史单次最佳成绩 %s)\n", coreUtils.BestOrAvgParser(sBest.Score, false))
-			continue
 		} else if sAvgOk && score.IsBestAvgScore(sAvg.Score) { // 刷了平均
 			if val.Project.RouteType() != model.RouteType1rounds && val.Project.RouteType() != model.RouteTypeRepeatedly {
 				out += fmt.Sprintf("(该成绩打破了自己的历史平均最佳成绩 %s)\n", coreUtils.BestOrAvgParser(sAvg.Score, true))
 			}
-			continue
 		}
 	}
 	return out
