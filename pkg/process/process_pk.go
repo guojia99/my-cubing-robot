@@ -44,6 +44,7 @@ func (P PK) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage InMes
 	msg := ReplaceAll(inMessage.Content, "", "-")
 	msg = ReplaceAll(msg, ",", "，", ".")
 	msg = ReplaceAll(msg, "vs", "VS", "Vs", "vS")
+	msg = ReplaceAll(msg, "", " ")
 
 	_, cl, players := CutMsgWithFields(msg, "vs")
 	if len(players) != 2 {
