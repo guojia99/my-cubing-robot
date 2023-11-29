@@ -74,17 +74,7 @@ func (p ProjectClass) allClassMsg() string {
 	return out
 }
 
-var projectClass = []model.ProjectClass{
-	model.ProjectClassWCA,
-	model.ProjectClassXCube,
-	model.ProjectClassXCubeBF,
-	model.ProjectClassXCubeOH,
-	model.ProjectClassXCubeFm,
-	model.ProjectClassXCubeRelay,
-	model.ProjectClassNotCube,
-	model.ProjectClassDigit,
-	model.ProjectClassSuperHigh,
-}
+var projectClass = model.ProjectClassList
 
 var projectMap = func() map[string]model.Project {
 	var out = make(map[string]model.Project)
