@@ -58,10 +58,9 @@ func (P PK) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage InMes
 		classValueOrPj = []string{}
 		for _, val := range strings.Split(cl, ",") {
 			pj, ok := projectMap[val]
-			if !ok {
-				return EventHandler(out.AddSprintf("项目 `%s` 不存在", val))
+			if ok {
+				classValueOrPj = append(classValueOrPj, string(pj))
 			}
-			classValueOrPj = append(classValueOrPj, string(pj))
 		}
 	}
 
