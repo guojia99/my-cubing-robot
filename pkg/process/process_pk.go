@@ -57,9 +57,13 @@ func (P PK) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage InMes
 	if len(cl) != 0 {
 		classValueOrPj = []string{}
 		for _, val := range strings.Split(cl, ",") {
-			pj, ok := projectMap[val]
-			if ok {
+			key := strings.TrimSpace(val)
+			if pj, ok := projectMap[key]; ok {
 				classValueOrPj = append(classValueOrPj, string(pj))
+				continue
+			}
+			if pjs := getClassProjects(model.ProjectClass(key)); len(pjs) > 0 {
+				classValueOrPj = append(classValueOrPj, key)
 			}
 		}
 	}
