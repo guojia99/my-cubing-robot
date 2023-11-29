@@ -86,6 +86,15 @@ var projectClass = []model.ProjectClass{
 	model.ProjectClassSuperHigh,
 }
 
+var projectMap = func() map[string]model.Project {
+	var out = make(map[string]model.Project)
+	for _, val := range model.AllProjectRoute() {
+		out[val.Cn()] = val
+		out[string(val)] = val
+	}
+	return out
+}()
+
 func getClassProjects(class model.ProjectClass) []model.Project {
 	var out []model.Project
 	for _, pj := range model.AllProjectItem() {

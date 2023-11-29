@@ -55,7 +55,14 @@ func (P PK) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage InMes
 		classValueOrPj = append(classValueOrPj, string(val))
 	}
 	if len(cl) != 0 {
-		classValueOrPj = strings.Split(cl, ",")
+		classValueOrPj = []string{}
+		for _, val := range strings.Split(cl, ",") {
+			pj, ok := projectMap[val]
+			if !ok {
+				return EventHandler(out.AddSprintf("项目 `%s` 不存在", val))
+			}
+			classValueOrPj = append(classValueOrPj, string(pj))
+		}
 	}
 
 	if len(classValueOrPj) == 0 {
@@ -145,11 +152,11 @@ func (P PK) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage InMes
 			out.AddSprintf("-------------- %s -------------\n", class)
 			out.AddSprintf(setMsg)
 			if p1C == p2C {
-				out.AddSprintf("%d 平局 %d\n", p1Count, p2Count)
+				out.AddSprintf("%d 平局 %d\n", p1C, p2C)
 			} else if p1C > p2C {
-				out.AddSprintf("胜利 %s %d vs %d\n", star, p1Count, p2Count)
+				out.AddSprintf("胜利 %s %d vs %d\n", star, p1C, p2C)
 			} else {
-				out.AddSprintf("%d vs %d 胜利 %s\n", p1Count, p2Count, star)
+				out.AddSprintf("%d vs %d 胜利 %s\n", p1C, p2C, star)
 			}
 		}
 	}
