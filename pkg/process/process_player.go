@@ -86,7 +86,7 @@ func (c *Player) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage 
 
 	out.AddSprintf("%s\n", player.Name)
 	out.AddSprintf("----------- 个人主页 -----------\n")
-	out.AddSprintf("http://www.mycube.club/x/player?id=%d\n", player.ID)
+	out.AddSprintf("https://mycube.club/x/player?id=%d\n", player.ID)
 
 	for _, class := range projectClass {
 		cur := ""

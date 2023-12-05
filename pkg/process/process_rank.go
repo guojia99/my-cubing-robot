@@ -77,7 +77,7 @@ func (r Rank) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage InM
 		}
 		out.AddSprintf("\n")
 	}
-	out.AddSprintf("详情请查看: http://www.mycube.club/x/statistics/best?tabs=best_all&cubes=%s", project)
+	out.AddSprintf("详情请查看: https://mycube.club/x/statistics/best?tabs=best_all&cubes=%s", project)
 	return EventHandler(out)
 }
 
