@@ -93,9 +93,9 @@ func (c *Contest) sendContest(ctx context.Context, db *gorm.DB, core core.Core, 
 	imageUrl := fmt.Sprintf("https://mycube.club/x-file/robot_image/%s", imagePath)
 
 	var contestFile = path.Join("/data/x-file/robot_image", imagePath)
-	var url = fmt.Sprintf("https://mycube.club/contest?id=%d&contest_tab=tab_nav_all_score_table", contest.ID)
+	var url = fmt.Sprintf("https://mycube.club/x/contest?id=%d&contest_tab=tab_nav_all_score_table", contest.ID)
 	//var url = ""
-	out.AddSprintf("比赛: %s\n详情请查看 %s\n", contest.Name, "")
+	out.AddSprintf("比赛: %s\n详情请查看 %s\n", contest.Name, url)
 
 	status, err := os.Stat(contestFile)
 	if err == nil && time.Since(status.ModTime()) < time.Minute*30 {
