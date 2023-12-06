@@ -102,7 +102,7 @@ func (c *Contest) sendContest(ctx context.Context, db *gorm.DB, core core.Core, 
 	var url = fmt.Sprintf("https://mycube.club/x/contest?id=%d&contest_tab=tab_nav_all_score_table", contest.ID)
 	//var url = ""
 	out.AddSprintf("比赛: %s\n详情请查看 %s\n", contest.Name, url)
-	out.AddSprintf("-----------------------------------")
+	out.AddSprintf("-----------------------------------\n")
 	out.AddSprintf("查询其他比赛请使用如下指令继续查询:\n")
 	for idx, cont := range allContest {
 		if cont.ID == contest.ID {
