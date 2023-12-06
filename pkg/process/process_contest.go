@@ -78,7 +78,7 @@ func (c *Contest) getContest(ctx context.Context, db *gorm.DB, core core.Core, m
 		}
 	}
 
-	if err := db.Where("is_end = ?", false).Where("name like ?", "群赛").First(&contest).Error; err == nil {
+	if err := db.Where("is_end = ?", false).Where("name like ?", "%%群赛%%").Order("created_at DESC").First(&contest).Error; err == nil {
 		return contest, all, nil
 	}
 	err := db.First(&contest).Error
