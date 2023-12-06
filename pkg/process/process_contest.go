@@ -55,35 +55,41 @@ func (c *Contest) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage
 	return c.sendContest(ctx, db, core, inMessage, EventHandler)
 }
 
-func (c *Contest) getContest(ctx context.Context, db *gorm.DB, core core.Core, msg string) (model.Contest, error) {
+func (c *Contest) getContest(ctx context.Context, db *gorm.DB, core core.Core, msg string) (model.Contest, []model.Contest, error) {
 	var contestId int
 	numbers := utils.GetNumbers(msg)
 	if len(numbers) > 0 {
 		contestId = int(numbers[0])
 	}
 
+	var all []model.Contest
+	db.Model(&model.Contest{}).Where("is_end = ?", false).Limit(5).Find(&all)
+
 	var contest model.Contest
 	if contestId != 0 {
-		return contest, db.Where("id = ?", contestId).First(&contest).Error
+		return contest, all, db.Where("id = ?", contestId).First(&contest).Error
 	}
 
 	msg = ReplaceAll(msg, "", c.Prefix()...)
 	if len(msg) > 0 {
 		err := db.Model(&model.Contest{}).Where("name like ?", fmt.Sprintf("%%%s%%", msg)).First(&contest).Error
 		if err == nil {
-			return contest, nil
+			return contest, all, nil
 		}
 	}
 
-	err := db.Order("created_at DESC").First(&contest).Error
-	return contest, err
+	if err := db.Where("is_end = ?", false).Where("name like ?", "群赛").First(&contest).Error; err == nil {
+		return contest, all, nil
+	}
+	err := db.First(&contest).Error
+	return contest, all, err
 }
 
 func (c *Contest) sendContest(ctx context.Context, db *gorm.DB, core core.Core, inMessage InMessage, EventHandler SendEventHandler) error {
 	out := inMessage.CopyOut()
 	msg := ReplaceAll(inMessage.Content, "", contestKey1, contestKey2, "-", " ")
 
-	contest, err := c.getContest(ctx, db, core, msg)
+	contest, allContest, err := c.getContest(ctx, db, core, msg)
 	if err != nil {
 		return EventHandler(out.AddError("找不到比赛"))
 	}
@@ -96,10 +102,18 @@ func (c *Contest) sendContest(ctx context.Context, db *gorm.DB, core core.Core, 
 	var url = fmt.Sprintf("https://mycube.club/x/contest?id=%d&contest_tab=tab_nav_all_score_table", contest.ID)
 	//var url = ""
 	out.AddSprintf("比赛: %s\n详情请查看 %s\n", contest.Name, url)
+	out.AddSprintf("-----------------------------------")
+	out.AddSprintf("查询其他比赛请使用如下指令继续查询:\n")
+	for idx, cont := range allContest {
+		if cont.ID == contest.ID {
+			continue
+		}
+		out.AddSprintf("%d. %s: *比赛-%d\n", idx, cont.Name, cont.ID)
+	}
 
 	status, err := os.Stat(contestFile)
 	if err == nil && time.Since(status.ModTime()) < time.Minute*30 {
-		return EventHandler(out.AddSprintf("【缓存图片】\n").AddImage(imageUrl))
+		return EventHandler(out.AddImage(imageUrl))
 	}
 
 	if err = exec.Command("python3", "/usr/local/bin/load_mycube_image.py", "--image", contestFile, "--url", url).Run(); err != nil {

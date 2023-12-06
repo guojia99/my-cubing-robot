@@ -12,6 +12,29 @@ from selenium.webdriver.chrome.service import Service
 # 1. 版本必须一致, 且大于114.x
 # 2. 放在该脚本同等的位置上
 
+
+def run(image: str, url: str, wait: int = 5):
+    service = Service(executable_path="/usr/local/bin/chromedriver-linux64/chromedriver")
+    chrome_options = Options()
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--disable-gpu')
+    chrome_options.add_argument('--start-maximized')
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.binary_location = "/usr/local/bin/chrome-linux64/chrome"
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+    driver.get(url)
+    driver.maximize_window()
+
+    time.sleep(wait)
+    driver.fullscreen_window()
+
+    height = driver.execute_script("return document.documentElement.scrollHeight")
+
+    driver.set_window_size(1980, height )
+    driver.save_screenshot(image)
+    driver.quit()
+
+
 def main():
     parser = argparse.ArgumentParser(description="image_load")
     parser.add_argument("--image", help="path")
@@ -20,26 +43,12 @@ def main():
 
     args = parser.parse_args()
     if args.image and args.url:
-        service = Service(executable_path="/usr/local/bin/chromedriver-linux64/chromedriver")
-        chrome_options = Options()
-        chrome_options.add_argument('--headless')
-        chrome_options.add_argument('--disable-gpu')
-        chrome_options.add_argument('--start-maximized')
-        chrome_options.add_argument("--no-sandbox")
-        chrome_options.binary_location = "/usr/local/bin/chrome-linux64/chrome"
-        driver = webdriver.Chrome(service=service, options=chrome_options)
-        driver.get(args.url)
-        driver.maximize_window()
-
-        time.sleep(args.wait)
-        driver.fullscreen_window()
-
-        height = driver.execute_script("return document.documentElement.scrollHeight")
-
-        driver.set_window_size(1980, height / 4 * 3)
-        driver.save_screenshot(args.image)
-        driver.quit()
+        run(args.image, args.url, args.wait)
 
 
 if __name__ == "__main__":
+    # p = "https://mycube.club/contest?id=41&contest_tab=tab_nav_all_score_table"
+    # run("test.png", p)
+    #
+    #
     main()
