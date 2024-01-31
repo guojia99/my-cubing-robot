@@ -6,8 +6,6 @@ import (
 	"slices"
 	"time"
 
-	"k8s.io/klog"
-
 	"github.com/guojia99/my_cubing_robot/pkg/process"
 )
 
@@ -19,9 +17,8 @@ func (q *QQBotClient) doProcessLoop() {
 		case <-q.ctx.Done():
 			return
 		case msg := <-q.inputCh:
-			klog.Infof("input msg with `%s`, by `%s` send `%s`", msg.GroupID, msg.UserID, msg.Content)
+			log.Printf("input msg with `%s`, by `%s` send `%s`\n", msg.GroupID, msg.UserID, msg.Content)
 			if len(q.conf.GroupList) != 0 && !slices.Contains(q.conf.GroupList, msg.GroupID) {
-				klog.Warning("continue")
 				continue
 			}
 			func() {
@@ -30,11 +27,11 @@ func (q *QQBotClient) doProcessLoop() {
 
 				prs, err := process.CheckPrefixPro(msg.Content, mp)
 				if err != nil {
-					klog.Warning(msg.Content, err.Error())
+					log.Printf("%s%s\n", msg.Content, err)
 					return
 				}
 				if err = prs.Do(ctx, q.db, q.core, msg, q.sendMsgFn()); err != nil {
-					log.Printf("[debug] do process error %s", err)
+					log.Printf("[debug] do process error %s\n", err)
 				}
 			}()
 
@@ -62,7 +59,7 @@ func (q *QQBotClient) getImageInfo(group, image string) (string, error) {
 
 	q.imageCache.Set(out.FileInfo, group+image, time.Minute*2)
 
-	klog.Infof("with file info %s, uuid %s", out.FileInfo, out.FileUuid)
+	log.Printf("with file info %s, uuid %s\n", out.FileInfo, out.FileUuid)
 	return out.FileInfo, nil
 }
 
@@ -99,13 +96,13 @@ func (q *QQBotClient) sendMsgFn() process.SendEventHandler {
 	return func(message *process.OutMessage) (err error) {
 		defer func() {
 			if result := recover(); result != nil {
-				klog.Error(result)
+				log.Print(result)
 			}
 			if err != nil {
-				klog.Error(err)
+				log.Print(err)
 			}
 		}()
-		klog.Infof("send Msg `%s` | `%s`", message.OutContent, message.Image)
+		log.Printf("send Msg `%s` | `%s`\n", message.OutContent, message.Image)
 		if q.conf.Group {
 			return q.groupMsg(message)
 		}
