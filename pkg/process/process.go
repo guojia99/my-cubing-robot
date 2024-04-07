@@ -23,9 +23,9 @@ var List = []Process{
 	&PK{}, // 成绩对比
 	//&Sor{},          // 排名分
 	//&SorX{},         // 排位分
-	&Record{}, // 记录
-	&Export{}, // 导出
-
+	&Record{},     // 记录
+	&Export{},     // 导出
+	&GetGroupID{}, // 获取群ID
 }
 
 const MaxKeyLength = 8

@@ -45,12 +45,7 @@ func (c *PreEnter) CheckPrefix(in string) bool {
 		return false
 	}
 	in = strings.ReplaceAll(in, key, "")
-
-	if len(utils.GetNumbers(in)) > 0 {
-		return true
-	}
-
-	return false
+	return true
 }
 
 func (c *PreEnter) Prefix() []string { return []string{preEnterKey, preEnterKey2} }
@@ -75,6 +70,7 @@ func (c *PreEnter) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessag
 	msg := ReplaceAll(inMessage.Content, "", append(c.Prefix(), "(", ")", "\n")...)
 	msg = strings.ReplaceAll(msg, "：", ":")
 	msg = strings.ReplaceAll(msg, "，", ",")
+	msg = strings.ReplaceAll(msg, ", ", ",")
 	msg = strings.ReplaceAll(msg, "\\", "/")
 	msg = strings.ReplaceAll(msg, "。", ".")
 	msg = ReplaceAll(msg, "[", "【", "〔", "〈", "［")
@@ -110,15 +106,15 @@ func (c *PreEnter) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessag
 	if len(msg) > 1 && msg[0] == '-' {
 		if num := utils.GetNumbers(msg[1:]); len(num) != 0 {
 			id := int(num[0])
-			err = db.Where("id = ?", id).Where("is_end = ?", false).First(&contest).Error
+			err = db.Where("id = ?", id).Where("group_id = ?", inMessage.GroupID).Where("is_end = ?", false).First(&contest).Error
 			msg = strings.Replace(msg[1:], fmt.Sprintf("%d", id), "", 1)
 		}
 	} else {
-		err = db.Where("is_end = ?", false).Where("name like ?", fmt.Sprintf("%%%s%%", "群赛")).First(&contest).Error
+		err = db.Where("is_end = ?", false).Where("group_id = ?", inMessage.GroupID).First(&contest).Error
 	}
 
 	if err != nil {
-		return EventHandler(out.AddError(errors.New("输入无效的比赛或找不到该比赛")))
+		return EventHandler(out.AddError(errors.New("输入无效的比赛或找不到该比赛,或只能参加本群的比赛")))
 	}
 
 	return EventHandler(out.AddSprintf(_simpleAddPreScore(db, core, player, contest, msg, inMessage.UserID)))
@@ -163,7 +159,7 @@ func _simpleAddPreScore(db *gorm.DB, core core.Core, player model.Player, contes
 			continue
 		} else if !bestOk && !score.DBest() {
 			out += fmt.Sprintf("(该成绩是第一个成功有单次成绩)\n")
-		} else if !avgOk && !score.DAvg() {
+		} else if !avgOk && !score.DAvg() && !(score.Project.RouteType() == model.RouteType1rounds || score.Project.RouteType() == model.RouteType1rounds) {
 			out += fmt.Sprintf("(该成绩是第一个成功有平均成绩)\n")
 		}
 		if bestOk && avgOk && score.IsBestScore(best) && score.IsBestAvgScore(avg) { // 双刷提示
@@ -198,7 +194,6 @@ func _simpleAddPreScore(db *gorm.DB, core core.Core, player model.Player, contes
 
 func _preScoresParser(db *gorm.DB, contest model.Contest, inMessage string) ([]core.AddPreScoreRequest, error) {
 	scores := strings.Split(inMessage, "/")
-	fmt.Println(scores)
 	if len(scores) == 0 {
 		return nil, errors.New("请输入正确的录入:\n 如：*录入 333 1.1,1.2,1:03.10,DNF,DNS")
 	}
