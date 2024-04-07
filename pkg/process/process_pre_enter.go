@@ -106,11 +106,11 @@ func (c *PreEnter) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessag
 	if len(msg) > 1 && msg[0] == '-' {
 		if num := utils.GetNumbers(msg[1:]); len(num) != 0 {
 			id := int(num[0])
-			err = db.Where("id = ?", id).Where("is_end = ?", false).Where("group_id like %?%", inMessage.GroupID).First(&contest).Error
+			err = db.Where("id = ?", id).Where("is_end = ?", false).Where("group_id like ?", fmt.Sprintf("%%%s%%", inMessage.GroupID)).First(&contest).Error
 			msg = strings.Replace(msg[1:], fmt.Sprintf("%d", id), "", 1)
 		}
 	} else {
-		err = db.Where("is_end = ?", false).Where("group_id like %?%", inMessage.GroupID).First(&contest).Error
+		err = db.Where("is_end = ?", false).Where("group_id like ?", fmt.Sprintf("%%%s%%", inMessage.GroupID)).First(&contest).Error
 	}
 
 	if err != nil {
