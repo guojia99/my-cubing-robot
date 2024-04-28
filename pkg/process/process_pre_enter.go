@@ -133,8 +133,10 @@ func _simpleAddPreScore(db *gorm.DB, core core.Core, player model.Player, contes
 
 	var out = fmt.Sprintf("比赛：%s\n", contest.Name)
 
-	bests, avgs := core.GetAllProjectBestScores()
-	sBests, sAvgs := core.GetPlayerBestScore(player.ID)
+	//bests, avgs := core.GetAllProjectBestScores()
+	//sBests, sAvgs := core.GetPlayerBestScore(player.ID)
+
+	bests, avgs, sBests, sAvgs := getPlayerBestScoresAndAllPlayerScores(core, player.ID)
 
 	for _, val := range preScores {
 		val.PlayerID = player.ID
@@ -151,9 +153,11 @@ func _simpleAddPreScore(db *gorm.DB, core core.Core, player model.Player, contes
 		score.SetResult(val.Result, model.ScorePenalty{})
 		out += fmt.Sprintf("%s %s (%s / %s) 录入成功！\n", player.Name, val.Project.Cn(), coreUtils.BestOrAvgParser(score, false), coreUtils.BestOrAvgParser(score, true))
 
+		pj := projectGroup(val.Project)
+
 		// 刷新记录成绩提示
-		best, bestOk := bests[val.Project]
-		avg, avgOk := avgs[val.Project]
+		best, bestOk := bests[pj]
+		avg, avgOk := avgs[pj]
 		if !bestOk && !avgOk && !score.DBest() && !score.DAvg() {
 			out += fmt.Sprintf("(该成绩是第一个成功有单次和平均有效成绩)\n")
 			continue
@@ -176,8 +180,8 @@ func _simpleAddPreScore(db *gorm.DB, core core.Core, player model.Player, contes
 		}
 
 		// 刷新pb
-		sBest, sBestOk := sBests[val.Project]
-		sAvg, sAvgOk := sAvgs[val.Project]
+		sBest, sBestOk := sBests[pj]
+		sAvg, sAvgOk := sAvgs[pj]
 
 		if sBestOk && sAvgOk && score.IsBestScore(sBest.Score) && score.IsBestAvgScore(sAvg.Score) { // 双刷提示
 			out += fmt.Sprintf("(该成绩双刷了自己的历史最佳成绩 (%s / %s))\n", coreUtils.BestOrAvgParser(sBest.Score, false), coreUtils.BestOrAvgParser(sAvg.Score, true))
@@ -289,4 +293,74 @@ func _getProject(in string) model.Project {
 	key := split[0]
 	val, _ := pjMap[key]
 	return val
+}
+
+func projectGroup(project model.Project) model.Project {
+	switch project {
+	case model.BFGroup333BF1, model.BFGroup333BF2, model.BFGroup333BF3, model.BFGroup333BF4,
+		model.BFGroup333BF6, model.BFGroup333BF5, model.BFGroup333BF7:
+		return model.BFGroup333BF1
+	case model.BFGroup444BF1, model.BFGroup444BF2, model.BFGroup444BF3, model.BFGroup444BF4:
+		return model.BFGroup444BF1
+	case model.BFGroup555BF1, model.BFGroup555BF2, model.BFGroup555BF3, model.BFGroup555BF4:
+		return model.BFGroup555BF1
+	case model.BFGroup333MBF1, model.BFGroup333MBF2, model.BFGroup333MBF3, model.BFGroup333MBF4:
+		return model.BFGroup333MBF1
+	}
+	return project
+}
+
+func meagreBldScore(in map[model.Project]model.Score, isBest bool) map[model.Project]model.Score {
+	var out = make(map[model.Project]model.Score)
+	for key, val := range in {
+		p := projectGroup(key)
+
+		inOut, ok := out[p]
+		if !ok {
+			out[p] = val
+			continue
+		}
+
+		checkFn := inOut.IsBestScore
+		if isBest {
+			checkFn = inOut.IsBestAvgScore
+		}
+
+		if checkFn(val) {
+			continue
+		}
+
+		out[p] = val
+	}
+	return out
+}
+
+func meagreBldRandScore(in map[model.Project]core.RankScore, isBest bool) map[model.Project]core.RankScore {
+	var out = make(map[model.Project]core.RankScore)
+	for key, val := range in {
+		p := projectGroup(key)
+
+		inOut, ok := out[p]
+		if !ok {
+			out[p] = val
+			continue
+		}
+
+		checkFn := inOut.Score.IsBestScore
+		if isBest {
+			checkFn = inOut.Score.IsBestAvgScore
+		}
+
+		if checkFn(val.Score) {
+			continue
+		}
+
+		out[p] = val
+	}
+	return out
+}
+func getPlayerBestScoresAndAllPlayerScores(core core.Core, playerID uint) (bests, avgs map[model.Project]model.Score, sBests, sAvgs map[model.Project]core.RankScore) {
+	bests, avgs = core.GetAllProjectBestScores()
+	sBests, sAvgs = core.GetPlayerBestScore(playerID)
+	return meagreBldScore(bests, true), meagreBldScore(avgs, false), meagreBldRandScore(sBests, true), meagreBldRandScore(sAvgs, false)
 }
