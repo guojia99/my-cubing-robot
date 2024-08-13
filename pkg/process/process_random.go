@@ -88,7 +88,7 @@ var randomKeys = map[string]randomValue{
 		value: []string{
 			"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
 			"N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"},
-		num:    1,
+		num:    2,
 		repeat: false,
 	},
 }
@@ -147,7 +147,7 @@ func randomWithMsg(msg string) []string {
 	} else {
 		val = randomValue{
 			value:  strings.Split(msg, ""),
-			num:    1,
+			num:    2,
 			repeat: false,
 		}
 	}
