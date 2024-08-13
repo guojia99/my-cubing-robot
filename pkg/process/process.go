@@ -26,6 +26,8 @@ var List = []Process{
 	&Record{},     // 记录
 	&Export{},     // 导出
 	&GetGroupID{}, // 获取群ID
+
+	&Random{}, // 随机字符
 }
 
 const MaxKeyLength = 8
