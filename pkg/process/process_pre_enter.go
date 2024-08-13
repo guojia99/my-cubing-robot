@@ -154,14 +154,14 @@ func _simpleAddPreScore(db *gorm.DB, core core.Core, player model.Player, contes
 		val.Source = "QQ-robot"
 		val.Recorder = qq
 
-		if err = core.AddPreScore(val); err != nil {
-			out += fmt.Sprintf("%s %s 录入失败： %s\n", player.Name, val.Project.Cn(), err)
+		if err = core.AddPreScore(val.AddPreScoreRequest); err != nil {
+			out += fmt.Sprintf("%s %s 录入失败： %s\n", player.Name, val.round.Name, err)
 			continue
 		}
 
 		score := model.Score{Project: val.Project}
 		score.SetResult(val.Result, model.ScorePenalty{})
-		out += fmt.Sprintf("%s %s (%s / %s) 录入成功！\n", player.Name, val.Project.Cn(), coreUtils.BestOrAvgParser(score, false), coreUtils.BestOrAvgParser(score, true))
+		out += fmt.Sprintf("%s %s (%s / %s) 录入成功！\n", player.Name, val.round.Name, coreUtils.BestOrAvgParser(score, false), coreUtils.BestOrAvgParser(score, true))
 
 		pj := projectGroup(val.Project)
 
@@ -206,13 +206,19 @@ func _simpleAddPreScore(db *gorm.DB, core core.Core, player model.Player, contes
 	return out
 }
 
-func _preScoresParser(db *gorm.DB, contest model.Contest, inMessage string) ([]core.AddPreScoreRequest, error) {
+type _preScoresParserAddPreScoreRequest struct {
+	core.AddPreScoreRequest
+
+	round model.Round
+}
+
+func _preScoresParser(db *gorm.DB, contest model.Contest, inMessage string) ([]_preScoresParserAddPreScoreRequest, error) {
 	scores := strings.Split(inMessage, "/")
 	if len(scores) == 0 {
 		return nil, errors.New("请输入正确的录入:\n 如：*录入 333 1.1,1.2,1:03.10,DNF,DNS")
 	}
 
-	var preScores []core.AddPreScoreRequest
+	var preScores []_preScoresParserAddPreScoreRequest
 	for _, score := range scores {
 		pj, roundNumber := _getProject(score)
 		if pj == "" {
@@ -252,13 +258,16 @@ func _preScoresParser(db *gorm.DB, contest model.Contest, inMessage string) ([]c
 		}
 
 		// 数据处理
-		var preScore = core.AddPreScoreRequest{
-			AddScoreRequest: core.AddScoreRequest{
-				Project: pj,
-				RoundId: round.ID,
-				Result:  []float64{},
-				Penalty: model.ScorePenalty{},
+		var preScore = _preScoresParserAddPreScoreRequest{
+			AddPreScoreRequest: core.AddPreScoreRequest{
+				AddScoreRequest: core.AddScoreRequest{
+					Project: pj,
+					RoundId: round.ID,
+					Result:  []float64{},
+					Penalty: model.ScorePenalty{},
+				},
 			},
+			round: round,
 		}
 		// 提取成绩：
 		// 1:03.10, DNF, DNS
