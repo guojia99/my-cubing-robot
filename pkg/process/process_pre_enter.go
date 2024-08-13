@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"regexp"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -59,8 +61,16 @@ func (c *PreEnter) Help() string {
 0. 如存在注册信息异常无法录入的情况下, 请使用第四个方式进行录入.
 1. 快速录入:  录入 {项目} {成绩...}
 2. 多项目:  录入 {项目} {成绩...} / {项目2} {成绩2}
-3. 指定比赛ID: 录入- {比赛ID} {项目} {成绩...}
-4. 为指定选手录入成绩: 录入[ID/名称]-{比赛ID} {项目} {成绩...} / {项目2} {成绩2}`
+3. 指定比赛ID: 录入-{比赛ID} {项目} {成绩...}
+4. 选择轮次: 录入 {项目}[{num}] {成绩...}
+
+--------------------
+例子：
+= 录入 333 1 1 2 3 4
+= 录入 333 1 1 2 3 4 / 444 1 1 2 3 4
+= 录入-1 333 1 1 2 3 4
+= 录入 333[1] 1 1 2 3 4
+`
 }
 
 func (c *PreEnter) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage InMessage, EventHandler SendEventHandler) error {
@@ -204,15 +214,17 @@ func _preScoresParser(db *gorm.DB, contest model.Contest, inMessage string) ([]c
 
 	var preScores []core.AddPreScoreRequest
 	for _, score := range scores {
-		pj := _getProject(score)
+		pj, roundNumber := _getProject(score)
 		if pj == "" {
 			return nil, fmt.Errorf("`%s`有不存在的项目", score)
 		}
 
 		// todo 解析 轮次
-		var roundNumber = 1
 		var round model.Round
-		if err := db.Where("contest_id = ?", contest.ID).Where("project = ?", pj).Where("number = ?", roundNumber).Where("is_start = ?", true).First(&round).Error; err != nil {
+		if err := db.Where("contest_id = ?", contest.ID).
+			Where("project = ?", pj).
+			Where("number = ?", roundNumber).
+			Where("is_start = ?", true).First(&round).Error; err != nil {
 			return nil, fmt.Errorf("`%s` 项目 轮次`%d` 不存在或者未开启该项目", pj, roundNumber)
 		}
 
@@ -272,11 +284,13 @@ var pjMap = func() map[string]model.Project {
 	return out
 }()
 
-func _getProject(in string) model.Project {
+func _getProject(in string) (model.Project, int) {
 	// 333 1.1,1.2,1:03.10,DNF,DNS
+	// 333[2] 1.1,1.2,1:03.10,DNF,DNS
+	// 333[决赛] 1.1,1.2,1:03.10,DNF,DNS
 	for {
 		if len(in) == 0 {
-			return ""
+			return "", 0
 		}
 		if in[0] == ' ' {
 			in = in[1:]
@@ -287,12 +301,19 @@ func _getProject(in string) model.Project {
 
 	split := strings.Split(in, " ")
 	if len(split) == 0 {
-		return ""
+		return "", 0
 	}
 
 	key := split[0]
+	var roundNum = 1
+	matches := regexp.MustCompile(`\[(.*?)\]`).FindStringSubmatch(key)
+	if len(matches) > 0 {
+		li := matches[1]
+		roundNum, _ = strconv.Atoi(li)
+	}
+
 	val, _ := pjMap[key]
-	return val
+	return val, roundNum
 }
 
 func projectGroup(project model.Project) model.Project {
