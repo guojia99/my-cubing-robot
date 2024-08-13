@@ -127,12 +127,13 @@ func (c *Random) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage 
 }
 
 func randomWithMsg(msg string) []string {
+	msg = strings.ReplaceAll(msg, " ", "")
 
 	//if len(msg) == 0 || len(strings.ReplaceAll(msg, " ", "")) == 0 {
 	// 	正常输出
 	//}
 	var val randomValue
-	if len(msg) == 0 || len(strings.ReplaceAll(msg, " ", "")) == 0 {
+	if len(msg) == 0 || len(strings.ReplaceAll(msg, " ", "")) == 0 || strings.Index(msg, "*") == 0 {
 		val = randomKeys["default"]
 	} else if strings.Contains(msg, "3bf") {
 		for _, k := range []string{

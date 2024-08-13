@@ -12,11 +12,16 @@ func Test_randomWithMsg(t *testing.T) {
 		"3bf edge",
 		"3bf edge*3",
 		"3bf corner*3",
-		"ABCDEFGHIJKLMN",
+		"BCEFHIJKLMNPQRSTWXYZ ",
 		"3bf xedge*3",
+		"*3",
 	}
 	for _, msg := range msgs {
-		fmt.Println(randomWithMsg(msg))
+		t.Run(
+			msg, func(t *testing.T) {
+				fmt.Println(randomWithMsg(msg))
+			},
+		)
 	}
 
 }
