@@ -117,11 +117,11 @@ func (c *Random) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage 
 	lists := randomWithMsg(msg)
 
 	if len(lists) == 1 {
-		return EventHandler(out.AddSprintf("%s\n", lists[0]))
+		return EventHandler(out.AddSprintf("%s", lists[0]))
 	}
 
 	for i, l := range lists {
-		out.AddSprintf("%d. %s", i+1, l)
+		out.AddSprintf("%d. %s\n", i+1, l)
 	}
 	return EventHandler(out)
 }
