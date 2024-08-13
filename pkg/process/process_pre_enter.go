@@ -321,6 +321,10 @@ func _getProject(in string) (model.Project, int) {
 		roundNum, _ = strconv.Atoi(li)
 	}
 
+	if idx := strings.Index(key, "["); idx != -1 {
+		key = key[:idx]
+	}
+
 	val, _ := pjMap[key]
 	return val, roundNum
 }
