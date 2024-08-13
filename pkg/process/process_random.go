@@ -194,5 +194,6 @@ func (c *Random) Help() string {
 	return `
 1. 输出随机的字母组合
 2. 随机 3bf {edge | corner | xedge | xcorner} {*n}
+3. {XXXXXX} 随机自定义
 `
 }
