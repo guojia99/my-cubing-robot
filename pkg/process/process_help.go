@@ -22,6 +22,11 @@ type Help struct {
 	keyMap map[string]Process
 }
 
+func (c *Help) IsGroup() bool {
+	//TODO implement me
+	return true
+}
+
 func (c *Help) CheckPrefix(in string) bool {
 	return false
 }

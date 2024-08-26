@@ -22,6 +22,10 @@ const (
 type MRank struct {
 }
 
+func (M MRank) IsGroup() bool {
+	return true
+}
+
 func (M MRank) CheckPrefix(in string) bool {
 	return false
 }

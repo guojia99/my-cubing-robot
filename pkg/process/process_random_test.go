@@ -15,6 +15,7 @@ func Test_randomWithMsg(t *testing.T) {
 		"BCEFHIJKLMNPQRSTWXYZ ",
 		"3bf xedge*3",
 		"*3",
+		"DEFHJR*3",
 	}
 	for _, msg := range msgs {
 		t.Run(

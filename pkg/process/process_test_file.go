@@ -11,6 +11,11 @@ import (
 type TestFile struct {
 }
 
+func (t TestFile) IsGroup() bool {
+	//TODO implement me
+	return true
+}
+
 func (t TestFile) CheckPrefix(in string) bool {
 	return false
 }

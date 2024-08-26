@@ -104,6 +104,10 @@ type Random struct {
 	keyMap map[string]Process
 }
 
+func (c *Random) IsGroup() bool {
+	return false
+}
+
 func (c *Random) CheckPrefix(in string) bool {
 	return false
 }
@@ -132,6 +136,19 @@ func randomWithMsg(msg string) []string {
 	//if len(msg) == 0 || len(strings.ReplaceAll(msg, " ", "")) == 0 {
 	// 	正常输出
 	//}
+	var num = 1
+	if strings.Contains(msg, "*") {
+		numStrIdx := strings.Index(msg, "*")
+		var err error
+		if num, err = strconv.Atoi(msg[numStrIdx+1:]); err != nil {
+			num = 1
+		}
+		msg = msg[:numStrIdx]
+	}
+	if num > 100 {
+		num = 100
+	}
+
 	var val randomValue
 	if len(msg) == 0 || len(strings.ReplaceAll(msg, " ", "")) == 0 || strings.Index(msg, "*") == 0 {
 		val = randomKeys["default"]
@@ -150,18 +167,6 @@ func randomWithMsg(msg string) []string {
 			num:    2,
 			repeat: false,
 		}
-	}
-
-	var num = 1
-	if strings.Contains(msg, "*") {
-		numStrIdx := strings.Index(msg, "*")
-		var err error
-		if num, err = strconv.Atoi(msg[numStrIdx+1:]); err != nil {
-			num = 1
-		}
-	}
-	if num > 100 {
-		num = 100
 	}
 
 	var outs []string

@@ -16,6 +16,8 @@ var _ Process = &Sor{}
 type Sor struct {
 }
 
+func (c *Sor) IsGroup() bool { return true }
+
 func (c *Sor) CheckPrefix(in string) bool {
 	return false
 }

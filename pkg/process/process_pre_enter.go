@@ -30,6 +30,10 @@ type PreEnter struct {
 	mp map[string]Process
 }
 
+func (c *PreEnter) IsGroup() bool {
+	return true
+}
+
 func (c *PreEnter) CheckPrefix(in string) bool {
 	c.once.Do(
 		func() {
@@ -62,7 +66,7 @@ func (c *PreEnter) Help() string {
 1. 快速录入:  录入 {项目} {成绩...}
 2. 多项目:  录入 {项目} {成绩...} / {项目2} {成绩2}
 3. 指定比赛ID: 录入-{比赛ID} {项目} {成绩...}
-4. 选择轮次: 录入 {项目}[{num}] {成绩...}
+4. 选择轮次: 录入 {项目}[{num}] {成绩...}, 注意，"{项目}[{num}]"部分数字不能有空格
 
 --------------------
 例子：

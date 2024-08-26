@@ -9,6 +9,9 @@ import (
 )
 
 var List = []Process{
+	&Random{},   // 随机字符
+	&BfRandom{}, // 盲拧随机生成助手
+
 	&TestFile{},
 	&Help{},         // 帮助
 	&Contest{},      // 比赛信息
@@ -26,8 +29,6 @@ var List = []Process{
 	&Record{},     // 记录
 	&Export{},     // 导出
 	&GetGroupID{}, // 获取群ID
-
-	&Random{}, // 随机字符
 }
 
 const MaxKeyLength = 8
@@ -62,6 +63,7 @@ type (
 		ShortHelp() string
 		Help() string
 		Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage InMessage, EventHandler SendEventHandler) error
+		IsGroup() bool
 	}
 )
 

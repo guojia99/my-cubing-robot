@@ -20,6 +20,10 @@ var _ Process = &NotPlay{}
 type NotPlay struct {
 }
 
+func (c *NotPlay) IsGroup() bool {
+	return true
+}
+
 func (c *NotPlay) CheckPrefix(in string) bool {
 	return false
 }

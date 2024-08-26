@@ -15,6 +15,10 @@ const (
 type GetGroupID struct {
 }
 
+func (g GetGroupID) IsGroup() bool {
+	return true
+}
+
 func (g GetGroupID) CheckPrefix(in string) bool { return false }
 
 func (g GetGroupID) Prefix() []string { return []string{groupIDKey, groupIDKey2} }

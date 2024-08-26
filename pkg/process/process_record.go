@@ -18,6 +18,10 @@ const (
 type Record struct {
 }
 
+func (r Record) IsGroup() bool {
+	return true
+}
+
 func (r Record) CheckPrefix(in string) bool {
 	return false
 }

@@ -19,6 +19,10 @@ const (
 type ProjectClass struct {
 }
 
+func (p ProjectClass) IsGroup() bool {
+	return true
+}
+
 func (p ProjectClass) CheckPrefix(in string) bool {
 	return false
 }

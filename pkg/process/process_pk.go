@@ -21,6 +21,10 @@ const (
 type PK struct {
 }
 
+func (P PK) IsGroup() bool {
+	return true
+}
+
 func (P PK) CheckPrefix(in string) bool {
 	return false
 }

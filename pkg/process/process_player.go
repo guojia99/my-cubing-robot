@@ -24,6 +24,10 @@ const (
 type Player struct {
 }
 
+func (c *Player) IsGroup() bool {
+	return true
+}
+
 func (c *Player) CheckPrefix(in string) bool {
 	return false
 }

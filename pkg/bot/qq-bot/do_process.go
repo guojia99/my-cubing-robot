@@ -18,9 +18,6 @@ func (q *QQBotClient) doProcessLoop() {
 			return
 		case msg := <-q.inputCh:
 			log.Printf("input msg with `%s`, by `%s` send `%s`\n", msg.GroupID, msg.UserID, msg.Content)
-			if len(q.conf.GroupList) != 0 && !slices.Contains(q.conf.GroupList, msg.GroupID) {
-				continue
-			}
 			func() {
 				ctx, cancel := context.WithCancel(q.ctx)
 				defer cancel()
@@ -30,6 +27,11 @@ func (q *QQBotClient) doProcessLoop() {
 					log.Printf("%s%s\n", msg.Content, err)
 					return
 				}
+
+				if len(q.conf.GroupList) != 0 && !slices.Contains(q.conf.GroupList, msg.GroupID) && prs.IsGroup() {
+					return
+				}
+
 				if err = prs.Do(ctx, q.db, q.core, msg, q.sendMsgFn()); err != nil {
 					log.Printf("[debug] do process error %s\n", err)
 				}

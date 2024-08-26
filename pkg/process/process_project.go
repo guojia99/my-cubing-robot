@@ -17,6 +17,10 @@ var _ Process = &Project{}
 type Project struct {
 }
 
+func (c *Project) IsGroup() bool {
+	return true
+}
+
 func (c *Project) CheckPrefix(in string) bool {
 	return false
 }

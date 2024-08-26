@@ -31,6 +31,10 @@ var _ Process = &Contest{}
 type Contest struct {
 }
 
+func (c *Contest) IsGroup() bool {
+	return true
+}
+
 func (c *Contest) CheckPrefix(in string) bool {
 	return false
 }

@@ -22,6 +22,10 @@ var _ Process = &RegisterUser{}
 type RegisterUser struct {
 }
 
+func (r *RegisterUser) IsGroup() bool {
+	return true
+}
+
 func (r *RegisterUser) CheckPrefix(in string) bool {
 	return false
 }

@@ -20,6 +20,10 @@ const (
 type Rank struct {
 }
 
+func (r Rank) IsGroup() bool {
+	return true
+}
+
 func (r Rank) CheckPrefix(in string) bool {
 	return false
 }

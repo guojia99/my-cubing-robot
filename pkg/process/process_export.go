@@ -22,6 +22,10 @@ type Export struct {
 	sync.Mutex
 }
 
+func (e *Export) IsGroup() bool {
+	return true
+}
+
 func (e *Export) CheckPrefix(in string) bool {
 	return false
 }
