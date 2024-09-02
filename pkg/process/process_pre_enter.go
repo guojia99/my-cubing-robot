@@ -238,28 +238,9 @@ func _preScoresParser(db *gorm.DB, contest model.Contest, inMessage string) ([]_
 			return nil, fmt.Errorf("`%s` 项目 轮次`%d` 不存在或者未开启该项目", pj, roundNumber)
 		}
 
-		// 移除所有成绩无关内容
-		cache := strings.ReplaceAll(score, string(pj), "")
-		cache = strings.ReplaceAll(cache, pj.Cn(), "")
-		regexp.MustCompile(`\[\w+\] `).ReplaceAllString(cache, "") // 去除[]
-
-		// 解析成绩分隔断
-		var ss []string
-		if strings.Contains(cache, ",") {
-			cache = strings.ReplaceAll(cache, " ", "")
-			ss = strings.Split(cache, ",")
-		} else {
-			ss = strings.Split(cache, " ")
-		}
-		var newSs []string
-		for _, val := range ss {
-			if len(val) > 0 {
-				newSs = append(newSs, val)
-			}
-		}
-		ss = newSs
-		if len(ss) == 0 {
-			return nil, fmt.Errorf("`%s` 无法执行无成绩的内容", score)
+		ss, err := _getResults(score, pj)
+		if err != nil {
+			return nil, err
 		}
 
 		// 数据处理
@@ -286,6 +267,39 @@ func _preScoresParser(db *gorm.DB, contest model.Contest, inMessage string) ([]_
 	}
 
 	return preScores, nil
+}
+
+func _getResults(in string, pj model.Project) ([]string, error) {
+	// 移除所有成绩无关内容
+	cache := strings.ReplaceAll(in, string(pj), "")
+	cache = strings.ReplaceAll(cache, pj.Cn(), "")
+
+	if idx := strings.Index(cache, "]"); idx != -1 {
+		cache = cache[idx+1:]
+	}
+	if idx := strings.Index(cache, "】"); idx != -1 {
+		cache = cache[idx+1:]
+	}
+
+	// 解析成绩分隔断
+	var ss []string
+	if strings.Contains(cache, ",") {
+		cache = strings.ReplaceAll(cache, " ", "")
+		ss = strings.Split(cache, ",")
+	} else {
+		ss = strings.Split(cache, " ")
+	}
+	var newSs []string
+	for _, val := range ss {
+		if len(val) > 0 {
+			newSs = append(newSs, val)
+		}
+	}
+	ss = newSs
+	if len(ss) == 0 {
+		return nil, fmt.Errorf("`%s` 无法执行无成绩的内容", in)
+	}
+	return ss, nil
 }
 
 var pjMap = func() map[string]model.Project {
