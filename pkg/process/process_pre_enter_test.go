@@ -3,6 +3,8 @@ package process
 import (
 	"fmt"
 	"testing"
+
+	"github.com/guojia99/my-cubing-core/model"
 )
 
 func TestPreEnter_CheckPrefix(t *testing.T) {
@@ -11,4 +13,38 @@ func TestPreEnter_CheckPrefix(t *testing.T) {
 	c := &PreEnter{}
 
 	fmt.Println(c.CheckPrefix(in))
+}
+
+func Test__getProject(t *testing.T) {
+	type args struct {
+		in string
+	}
+	tests := []struct {
+		name  string
+		args  args
+		want  model.Project
+		want1 int
+	}{
+		{
+			name: "1",
+			args: args{
+				in: "333[2] 1 2 3 4 5",
+			},
+			want:  model.Cube333,
+			want1: 2,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(
+			tt.name, func(t *testing.T) {
+				got, got1 := _getProject(tt.args.in)
+				if got != tt.want {
+					t.Errorf("_getProject() got = %v, want %v", got, tt.want)
+				}
+				if got1 != tt.want1 {
+					t.Errorf("_getProject() got1 = %v, want %v", got1, tt.want1)
+				}
+			},
+		)
+	}
 }

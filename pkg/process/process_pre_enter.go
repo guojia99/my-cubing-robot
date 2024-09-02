@@ -241,6 +241,7 @@ func _preScoresParser(db *gorm.DB, contest model.Contest, inMessage string) ([]_
 		// 移除所有成绩无关内容
 		cache := strings.ReplaceAll(score, string(pj), "")
 		cache = strings.ReplaceAll(cache, pj.Cn(), "")
+		regexp.MustCompile(`\[\w+\] `).ReplaceAllString(cache, "") // 去除[]
 
 		// 解析成绩分隔断
 		var ss []string
@@ -275,7 +276,7 @@ func _preScoresParser(db *gorm.DB, contest model.Contest, inMessage string) ([]_
 		}
 		// 提取成绩：
 		// 1:03.10, DNF, DNS
-		// 1:03.10(1,2), DNF, DNS
+		// 1:03.10(1,2), DNF, DNS TODO
 		for _, s := range ss {
 			// todo 成绩解析 带penalty的
 			preScore.Result = append(preScore.Result, utils.ParserTimeToSeconds(s))
