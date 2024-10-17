@@ -29,6 +29,7 @@ var List = []Process{
 	&Record{},     // 记录
 	&Export{},     // 导出
 	&GetGroupID{}, // 获取群ID
+	&XDelete{},    // 假删除
 }
 
 const MaxKeyLength = 8

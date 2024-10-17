@@ -5,8 +5,9 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 
-
+# todo 做成docker
 # python load_mycube_image.py --image 2.png --url https://mycube.club/
+# 将依赖都放在 /usr/local/bin/
 # 使用该脚本, 你必须去下载两样东西
 # chromedriver 和 chrome
 # 1. 版本必须一致, 且大于114.x

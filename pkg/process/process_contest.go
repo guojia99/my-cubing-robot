@@ -116,7 +116,7 @@ func (c *Contest) sendContest(ctx context.Context, db *gorm.DB, core core.Core, 
 	}
 
 	status, err := os.Stat(contestFile)
-	if err == nil && time.Since(status.ModTime()) < time.Minute*30 {
+	if err == nil && time.Since(status.ModTime()) < time.Second*120 {
 		return EventHandler(out.AddImage(imageUrl))
 	}
 

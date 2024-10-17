@@ -132,10 +132,6 @@ func (c *Random) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage 
 
 func randomWithMsg(msg string) []string {
 	msg = strings.ReplaceAll(msg, " ", "")
-
-	//if len(msg) == 0 || len(strings.ReplaceAll(msg, " ", "")) == 0 {
-	// 	正常输出
-	//}
 	var num = 1
 	if strings.Contains(msg, "*") {
 		numStrIdx := strings.Index(msg, "*")
