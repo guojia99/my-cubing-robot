@@ -38,16 +38,12 @@ func getPlayerMessage(ctx context.Context, db *gorm.DB, core core.Core, inMessag
 	out := inMessage.CopyOut()
 	msg := ReplaceAll(inMessage.Content, "", append(keys, " ", "-")...)
 
-	if len(msg) > 1 && msg[0] == '-' {
-		msg = msg[1:]
-	}
-
 	// id查询
 	var player model.Player
 
 	// 模糊查询
 	var players []model.Player
-	db.Where("name like ?", fmt.Sprintf("%%%s%%", msg)).Find(&players)
+	db.Where("name like ?", fmt.Sprintf("%%%s%%", msg)).Or("id = ?", msg).Find(&players)
 	if len(players) >= 2 {
 		out.AddSprintf("选择指定的选手进行查询\n")
 		for _, val := range players {
@@ -64,7 +60,7 @@ func getPlayerMessage(ctx context.Context, db *gorm.DB, core core.Core, inMessag
 		number := utils.GetNumbers(msg)
 		if len(number) > 0 && number[0] > 0 {
 			id := int(number[0])
-			if err := db.Where("id = ?", id).First(&player).Error; err == nil {
+			if err := db.Where("id = ?", id).First(&player).Error; err != nil {
 				_ = EventHandler(out.AddSprintf("查询不到玩家"))
 				return player, fmt.Errorf("error")
 			}
