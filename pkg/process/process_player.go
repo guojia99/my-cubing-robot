@@ -34,9 +34,9 @@ func (c *Player) CheckPrefix(in string) bool {
 
 func (c *Player) Prefix() []string { return []string{playerKey, playerKey2, playerKey3} }
 
-func (c *Player) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage InMessage, EventHandler SendEventHandler) error {
+func getPlayerMessage(ctx context.Context, db *gorm.DB, core core.Core, inMessage InMessage, EventHandler SendEventHandler, keys []string) (model.Player, error) {
 	out := inMessage.CopyOut()
-	msg := ReplaceAll(inMessage.Content, "", playerKey, playerKey2, playerKey3, " ", "-")
+	msg := ReplaceAll(inMessage.Content, "", append(keys, " ", "-")...)
 
 	if len(msg) > 1 && msg[0] == '-' {
 		msg = msg[1:]
@@ -44,32 +44,47 @@ func (c *Player) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage 
 
 	// id查询
 	var player model.Player
-	number := utils.GetNumbers(msg)
-	if len(number) > 0 && number[0] > 0 {
-		id := int(number[0])
-		if err := db.Where("id = ?", id).First(&player).Error; err == nil {
-			return EventHandler(out.AddSprintf("查询不到玩家"))
-		}
-	}
 
 	// 模糊查询
-	if player.ID == 0 {
-		var players []model.Player
-		db.Where("name like ?", fmt.Sprintf("%%%s%%", msg)).Find(&players)
-
-		if len(players) >= 2 {
-			out.AddSprintf("选择指定的选手进行查询\n")
-			for _, val := range players {
-				out.AddSprintf("%d、%s\n", val.ID, val.Name)
-			}
-			return EventHandler(out)
+	var players []model.Player
+	db.Where("name like ?", fmt.Sprintf("%%%s%%", msg)).Find(&players)
+	if len(players) >= 2 {
+		out.AddSprintf("选择指定的选手进行查询\n")
+		for _, val := range players {
+			out.AddSprintf("%d、%s\n", val.ID, val.Name)
 		}
-		if len(players) == 0 {
-			return EventHandler(out.AddSprintf("查询不到玩家"))
-		}
+		_ = EventHandler(out)
+		return player, fmt.Errorf("error")
+	}
+	if len(players) == 1 {
 		player = players[0]
 	}
 
+	if player.ID == 0 {
+		number := utils.GetNumbers(msg)
+		if len(number) > 0 && number[0] > 0 {
+			id := int(number[0])
+			if err := db.Where("id = ?", id).First(&player).Error; err == nil {
+				_ = EventHandler(out.AddSprintf("查询不到玩家"))
+				return player, fmt.Errorf("error")
+			}
+		} else {
+			if len(players) == 0 {
+				_ = EventHandler(out.AddSprintf("查询不到玩家"))
+				return player, fmt.Errorf("error")
+			}
+		}
+	}
+	return player, nil
+}
+
+func (c *Player) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage InMessage, EventHandler SendEventHandler) error {
+	player, err := getPlayerMessage(ctx, db, core, inMessage, EventHandler, c.Prefix())
+	if err != nil {
+		return nil
+	}
+
+	out := inMessage.CopyOut()
 	if _, ok := _cache.Get(fmt.Sprintf("%d", player.ID)); ok {
 		return EventHandler(out.AddSprintf("该玩家已被移除"))
 	}

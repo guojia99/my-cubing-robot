@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/guojia99/my-cubing-core/model"
-	"github.com/guojia99/my_cubing_robot/pkg/utils"
 	"github.com/patrickmn/go-cache"
 	"time"
 
@@ -47,14 +46,11 @@ func (g XDelete) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage 
 	if len(msg) > 1 && msg[0] == '-' {
 		msg = msg[1:]
 	}
-	var player model.Player
-	number := utils.GetNumbers(msg)
-	if len(number) > 0 && number[0] > 0 {
-		id := int(number[0])
-		if err := db.Where("id = ?", id).First(&player).Error; err == nil {
-			return EventHandler(out.AddSprintf("查询不到玩家"))
-		}
+	player, err := getPlayerMessage(ctx, db, core, inMessage, EventHandler, g.Prefix())
+	if err != nil {
+		return nil
 	}
+
 	_cache.Set(fmt.Sprintf("%d", player.ID), player, time.Minute*60)
 
 	return EventHandler(out.AddSprintf("%s 删除成功", player.Name))
