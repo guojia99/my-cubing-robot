@@ -70,6 +70,10 @@ func (c *Player) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage 
 		player = players[0]
 	}
 
+	if _, ok := _cache.Get(fmt.Sprintf("%d", player.ID)); ok {
+		return EventHandler(out.AddSprintf("该玩家已被移除"))
+	}
+
 	// 渲染
 	bestAll, avgAll := core.GetPlayerBestScore(player.ID)
 

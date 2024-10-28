@@ -2,8 +2,11 @@ package process
 
 import (
 	"context"
+	"fmt"
 	"github.com/guojia99/my-cubing-core/model"
 	"github.com/guojia99/my_cubing_robot/pkg/utils"
+	"github.com/patrickmn/go-cache"
+	"time"
 
 	core "github.com/guojia99/my-cubing-core"
 	"gorm.io/gorm"
@@ -13,6 +16,8 @@ const (
 	deleteKey  = "x删除"
 	deleteKey2 = "x_delete"
 )
+
+var _cache = cache.New(time.Minute*10, time.Minute*20)
 
 type XDelete struct {
 }
@@ -50,6 +55,7 @@ func (g XDelete) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage 
 			return EventHandler(out.AddSprintf("查询不到玩家"))
 		}
 	}
+	_cache.Set(fmt.Sprintf("%d", player.ID), player, time.Minute*60)
 
 	return EventHandler(out.AddSprintf("%s 删除成功", player.Name))
 }
