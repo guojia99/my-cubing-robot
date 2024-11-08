@@ -42,6 +42,19 @@ func (c *RandomPo) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessag
 	if len(sl) == 0 {
 		return EventHandler(out.AddSprintf("空空如也"))
 	}
-	sl = shuffledCopy(sl, false)
-	return EventHandler(out.AddSprintf(sl[0]))
+
+	var newList = []string{}
+	for _, v := range sl {
+		v = strings.TrimLeft(v, " ")
+		if len(v) == 0 {
+			continue
+		}
+		if v == " " {
+			continue
+		}
+		newList = append(newList, v)
+	}
+
+	newList = shuffledCopy(newList, false)
+	return EventHandler(out.AddSprintf(newList[0]))
 }
