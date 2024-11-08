@@ -10,6 +10,7 @@ import (
 
 var List = []Process{
 	&Random{},   // 随机字符
+	&RandomPo{}, // 随机选择
 	&BfRandom{}, // 盲拧随机生成助手
 
 	&TestFile{},
