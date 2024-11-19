@@ -38,7 +38,7 @@ func (c *RandomPo) Prefix() []string { return []string{randomPoKey1, randomPoKey
 func (c *RandomPo) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage InMessage, EventHandler SendEventHandler) error {
 	out := inMessage.CopyOut()
 	fstring := strings.Contains(inMessage.Content, randomPoKey2)
-	msg := ReplaceAll(inMessage.Content, "", randomPoKey1, randomPoKey2)
+	msg := ReplaceAll(inMessage.Content, "", randomPoKey2, randomPoKey1)
 
 	sl := strings.Split(msg, " ")
 	if len(sl) == 0 {
