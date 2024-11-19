@@ -10,6 +10,7 @@ import (
 
 const (
 	randomPoKey1 = "选择"
+	randomPoKey2 = "选择f"
 )
 
 type RandomPo struct {
@@ -32,18 +33,20 @@ func (c *RandomPo) CheckPrefix(in string) bool {
 	return false
 }
 
-func (c *RandomPo) Prefix() []string { return []string{randomPoKey1} }
+func (c *RandomPo) Prefix() []string { return []string{randomPoKey1, randomPoKey2} }
 
 func (c *RandomPo) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessage InMessage, EventHandler SendEventHandler) error {
 	out := inMessage.CopyOut()
-	msg := ReplaceAll(inMessage.Content, "", randomPoKey1)
+	fstring := strings.Contains(inMessage.Content, randomPoKey2)
+	msg := ReplaceAll(inMessage.Content, "", randomPoKey1, randomPoKey2)
 
 	sl := strings.Split(msg, " ")
 	if len(sl) == 0 {
 		return EventHandler(out.AddSprintf("空空如也"))
 	}
 
-	var newList = []string{}
+	var newList []string
+	fStr := ""
 	for _, v := range sl {
 		v = strings.TrimLeft(v, " ")
 		if len(v) == 0 {
@@ -52,9 +55,26 @@ func (c *RandomPo) Do(ctx context.Context, db *gorm.DB, core core.Core, inMessag
 		if v == " " {
 			continue
 		}
+
+		if fstring && len(fStr) == 0 {
+			fStr = v
+			continue
+		}
+
 		newList = append(newList, v)
 	}
-
 	newList = shuffledCopy(newList, false)
-	return EventHandler(out.AddSprintf(newList[0]))
+
+	find := newList[0]
+	if !fstring {
+		return EventHandler(out.AddSprintf(find))
+	}
+
+	if strings.Contains(fStr, "{}") {
+		fStr = strings.ReplaceAll(fStr, "{}", find)
+	} else {
+		fStr += find
+	}
+
+	return EventHandler(out.AddSprintf(fStr))
 }
