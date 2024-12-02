@@ -35,7 +35,7 @@ func (c *CQHttpClient) sendMsg(out *process.OutMessage) error {
 	// todo 使用CQ码
 
 	_, err := utils.HTTPRequest(
-		"POST", fmt.Sprintf("%s/send_group_msg", c.conf.Address), nil, nil, msg,
+		"POST", fmt.Sprintf("%s:%d/send_group_msg", c.conf.Address, c.conf.SendPort), nil, nil, msg,
 	)
 
 	//data, _ := json.Marshal(msg)
