@@ -37,12 +37,11 @@ func NewCQHttpClient(conf Config, db *gorm.DB) *CQHttpClient {
 func (c *CQHttpClient) Run(ctx context.Context) error {
 	c.Ctx = ctx
 	c.api = gin.Default()
+	c.SendMsgFn = c.sendMsgFn()
 
 	c.api.NoRoute(c.route)
 
-	for i := 0; i < 4; i++ {
-		go c.DoProcessLoop()
-	}
+	go c.DoProcessLoop()
 
 	return c.api.Run(fmt.Sprintf("127.0.0.1:%d", c.conf.Port))
 }
