@@ -2,6 +2,7 @@ package qq_bot
 
 import (
 	"context"
+	"github.com/guojia99/my_cubing_robot/pkg/bot/process_tools"
 	"log"
 	"time"
 
@@ -14,36 +15,30 @@ import (
 
 func NewQQBotClient(conf Configs, db *gorm.DB) *QQBotClient {
 	return &QQBotClient{
-		db:         db,
-		core:       core.NewCore(db, false, time.Second),
 		conf:       conf,
-		inputCh:    make(chan process.InMessage, 255),
-		outputCh:   make(chan MessageToCreate, 255),
 		imageCache: cache.New(time.Minute*5, time.Minute*5),
+		ProcessClient: process_tools.ProcessClient{
+			Ctx:      nil,
+			Db:       db,
+			Core:     core.NewCore(db, false, time.Second),
+			InputCh:  make(chan process.InMessage),
+			OutputCh: make(chan interface{}),
+		},
 	}
 }
 
 type QQBotClient struct {
-	ctx context.Context
+	process_tools.ProcessClient
 
-	db   *gorm.DB
-	core core.Core
-
-	conf     Configs
-	api      OpenAPI
-	inputCh  chan process.InMessage
-	outputCh chan MessageToCreate
-	process  []process.Process
+	conf Configs
+	api  OpenAPI
 
 	imageCache *cache.Cache
 }
 
-func (q *QQBotClient) RegisterProcess(process ...process.Process) {
-	q.process = append(q.process, process...)
-}
-
 func (q *QQBotClient) Run(ctx context.Context) error {
-	q.ctx = ctx
+	q.Ctx = ctx
+	q.SendMsgFn = q.sendMsgFn()
 
 	SetLogger(logger)
 
@@ -69,7 +64,7 @@ func (q *QQBotClient) Run(ctx context.Context) error {
 
 	// look message input, and doing process detail
 	for i := 0; i < 4; i++ {
-		go q.doProcessLoop()
+		go q.DoProcessLoop()
 	}
 
 	log.Printf("start qq bot")

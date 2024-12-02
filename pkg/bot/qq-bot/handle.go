@@ -40,7 +40,7 @@ func (q *QQBotClient) checkAnyMessage(input string, at bool) (result string, err
 func (q *QQBotClient) _atGroupMessageEventHandler() event.GroupAtMessageEventHandler {
 	return func(event *WSPayload, data *WSGroupATMessageData) (err error) {
 		if data.Content, err = q.checkAnyMessage(data.Content, true); err == nil {
-			q.inputCh <- anyMessageToMessage(data)
+			q.InputCh <- anyMessageToMessage(data)
 		}
 		return
 	}
@@ -49,7 +49,7 @@ func (q *QQBotClient) _atGroupMessageEventHandler() event.GroupAtMessageEventHan
 func (q *QQBotClient) _groupMessageEventHandler() event.GroupMessageEventHandler {
 	return func(event *WSPayload, data *WSGroupMessageData) (err error) {
 		if data.Content, err = q.checkAnyMessage(data.Content, false); err == nil {
-			q.inputCh <- anyMessageToMessage(data)
+			q.InputCh <- anyMessageToMessage(data)
 		}
 		return
 	}
@@ -58,7 +58,7 @@ func (q *QQBotClient) _groupMessageEventHandler() event.GroupMessageEventHandler
 func (q *QQBotClient) _atMessageEventHandler() event.ATMessageEventHandler {
 	return func(event *WSPayload, data *WSATMessageData) (err error) {
 		if data.Content, err = q.checkAnyMessage(data.Content, true); err == nil {
-			q.inputCh <- anyMessageToMessage(data)
+			q.InputCh <- anyMessageToMessage(data)
 		}
 		return
 	}
@@ -67,7 +67,7 @@ func (q *QQBotClient) _atMessageEventHandler() event.ATMessageEventHandler {
 func (q *QQBotClient) _messageEventHandler() event.MessageEventHandler {
 	return func(event *WSPayload, data *WSMessageData) (err error) {
 		if data.Content, err = q.checkAnyMessage(data.Content, false); err == nil {
-			q.inputCh <- anyMessageToMessage(data)
+			q.InputCh <- anyMessageToMessage(data)
 		}
 		return
 	}

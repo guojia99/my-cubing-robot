@@ -2,6 +2,7 @@ package bot
 
 import (
 	"context"
+	cq_http "github.com/guojia99/my_cubing_robot/pkg/bot/cq-http"
 	"sync"
 
 	"github.com/guojia99/my-cubing-core/model"
@@ -71,6 +72,10 @@ func NewBots(cfgFile string) (Bot, error) {
 	}
 	for _, val := range cfg.QQBot {
 		bots.bots = append(bots.bots, qq_bot.NewQQBotClient(val, db))
+	}
+
+	for _, val := range cfg.CQHttp {
+		bots.bots = append(bots.bots, cq_http.NewCQHttpClient(val, db))
 	}
 
 	return bots, nil

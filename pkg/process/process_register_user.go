@@ -65,7 +65,7 @@ func (r *RegisterUser) Do(ctx context.Context, db *gorm.DB, core core.Core, inMe
 
 	// 绑定
 	var checkUser model.PlayerUser
-	if err := db.Where("qq_bot_uni_id = ?", inMessage.UserID).First(&checkUser).Error; err == nil {
+	if err := db.Where("qq_bot_uni_id = ?", inMessage.UserID).Or("qq = ?", inMessage.UserID).First(&checkUser).Error; err == nil {
 		var p model.Player
 		db.Where("id = ?", checkUser.PlayerID).First(&p)
 		return EventHandler(out.AddSprintf("该ID `%s`, 已经被`%s`选手绑定", inMessage.UserID, p.Name))
