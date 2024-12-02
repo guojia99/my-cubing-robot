@@ -16,21 +16,25 @@ func (c *CQHttpClient) sendMsg(out *process.OutMessage) error {
 		Message:    []Message{},
 		AutoEscape: false,
 	}
-	msg.Message = append(msg.Message, Message{
-		Data: MessageData{
-			Text: out.OutContent,
-		},
-		Type: "text",
-	})
+	if out.OutContent != "" {
+		msg.Message = append(msg.Message, Message{
+			Data: MessageData{
+				Text: out.OutContent,
+			},
+			Type: "text",
+		})
+	}
 
-	msg.Message = append(msg.Message, Message{
-		Data: MessageData{
-			File:    "file://" + out.Image,
-			Type:    "show",
-			SubType: 0,
-		},
-		Type: "image",
-	})
+	if out.Image != "" {
+		msg.Message = append(msg.Message, Message{
+			Data: MessageData{
+				File:    "file://" + out.Image,
+				Type:    "show",
+				SubType: 0,
+			},
+			Type: "image",
+		})
+	}
 
 	// todo 使用CQ码
 
