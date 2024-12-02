@@ -125,7 +125,7 @@ func (c *Contest) sendContest(ctx context.Context, db *gorm.DB, core core.Core, 
 		out.AddSprintf("【图像生成失败】")
 		return EventHandler(out)
 	}
-	return EventHandler(out.AddImage(imageUrl))
+	return EventHandler(out.AddImage(contestFile))
 }
 
 func (c *Contest) sendList(ctx context.Context, db *gorm.DB, core core.Core, inMessage InMessage, EventHandler SendEventHandler) error {
